@@ -1,0 +1,67 @@
+[
+  {
+    "model": "categories.announcementcategory",
+    "pk": 1,
+    "fields": {
+      "key": "job_seeker",
+      "emoji": "💼",
+      "name_uz": "Ish kerak",
+      "name_en": "Looking for a job",
+      "name_ru": "Ищу работу",
+      "is_active": true,
+      "order": 1
+    }
+  },
+  {
+    "model": "categories.announcementcategory",
+    "pk": 2,
+    "fields": {
+      "key": "mentor_needed",
+      "emoji": "👨‍🏫",
+      "name_uz": "Ustoz kerak",
+      "name_en": "Looking for a mentor",
+      "name_ru": "Ищу наставника",
+      "is_active": true,
+      "order": 2
+    }
+  },
+  {
+    "model": "categories.announcementcategory",
+    "pk": 3,
+    "fields": {
+      "key": "employee_needed",
+      "emoji": "👨‍💼",
+      "name_uz": "Xodim kerak",
+      "name_en": "Looking for an employee",
+      "name_ru": "Ищу сотрудника",
+      "is_active": true,
+      "order": 3
+    }
+  },
+  {
+    "model": "categories.announcementcategory",
+    "pk": 4,
+    "fields": {
+      "key": "partner_needed",
+      "emoji": "🤝",
+      "name_uz": "Hamkor kerak",
+      "name_en": "Looking for a partner",
+      "name_ru": "Ищу партнёра",
+      "is_active": true,
+      "order": 4
+    }
+  },
+  {
+    "model": "categories.announcementcategory",
+    "pk": 5,
+    "fields": {
+      "key": "student_needed",
+      "emoji": "🎓",
+      "name_uz": "Shogird kerak",
+      "name_en": "Looking for a student",
+      "name_ru": "Ищу ученика",
+      "is_active": true,
+      "order": 5
+    }
+  }
+]
