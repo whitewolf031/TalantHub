@@ -1,0 +1,33 @@
+name: talanthub_ci
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Test & build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.ref_name == "main" && "production" || "development" }}
+
+    steps:
+      - name: Check code
+        uses: actions/checkout@v4
+        
