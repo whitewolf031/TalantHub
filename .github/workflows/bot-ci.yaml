@@ -6,6 +6,11 @@ on:
       - talanthub_ci
     types:
       - completed
+  
+  push:
+    branches:
+      - main
+      - dev
 
 permissions:
   contents: read
