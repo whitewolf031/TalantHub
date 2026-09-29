@@ -1,0 +1,133 @@
+name: talanthub_bot_ci
+
+on:
+  workflow_run:
+    workflows:
+      - talanthub_ci
+    types:
+      - completed
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/bot
+
+jobs:
+  test:
+    name: Bot Test & Build
+
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      (github.event.workflow_run.head_branch == 'main' ||
+       github.event.workflow_run.head_branch == 'dev')
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout bot code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: bot/requirements.txt
+
+      - name: Install dependencies
+        working-directory: bot
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Bot check
+        working-directory: bot
+        env:
+          BOT_TOKEN: ${{ secrets.PRODUCTION_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.PRODUCTION_CHANNEL_ID }}
+          ADMIN_IDS: ${{ secrets.PRODUCTION_ADMIN_IDS }}
+          BACKEND_API_URL: ${{ secrets.PRODUCTION_BACKEND_API_URL }}
+          INTERNAL_API_KEY: ${{ secrets.PRODUCTION_INTERNAL_API_KEY }}
+        run: |
+          python -m py_compile bot.py
+
+      - name: Run tests
+        working-directory: bot
+        env:
+          BOT_TOKEN: ${{ secrets.PRODUCTION_BOT_TOKEN }}
+          CHANNEL_ID: ${{ secrets.PRODUCTION_CHANNEL_ID }}
+          ADMIN_IDS: ${{ secrets.PRODUCTION_ADMIN_IDS }}
+          BACKEND_API_URL: ${{ secrets.PRODUCTION_BACKEND_API_URL }}
+          INTERNAL_API_KEY: ${{ secrets.PRODUCTION_INTERNAL_API_KEY }}
+        run: |
+          python -m pytest
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Prepare docker image
+        id: image
+        shell: bash
+        run: |
+          set -e
+
+          BRANCH="${{ github.event.workflow_run.head_branch }}"
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          SHORT_SHA="${SHA:0:7}"
+
+          IMAGE_NAME="$(echo "${IMAGE_NAME}" | tr '[:upper:]' '[:lower:]')"
+
+          IMAGE="${REGISTRY}/${IMAGE_NAME}:${BRANCH}-${SHORT_SHA}"
+
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+
+          echo "======================================"
+          echo "Talanthub Bot CI"
+          echo "======================================"
+          echo "Branch     : $BRANCH"
+          echo "Commit     : $SHA"
+          echo "Short SHA  : $SHORT_SHA"
+          echo "Environment: production"
+          echo "Image      : $IMAGE"
+          echo "======================================"
+
+      - name: Build docker image
+        working-directory: bot
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t "${{ steps.image.outputs.image }}" \
+            .
+
+      - name: Push docker image to GHCR
+        run: |
+          docker push "${{ steps.image.outputs.image }}"
+
+      - name: CI message
+        run: |
+          echo "### 🐳 Talanthub Bot CI" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Branch:** ${{ steps.image.outputs.branch }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Commit:** ${{ steps.image.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Environment:** production" >> "$GITHUB_STEP_SUMMARY"
+          echo "- **Image:** ${{ steps.image.outputs.image }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Docker image successfully pushed to GHCR." >> "$GITHUB_STEP_SUMMARY"
