@@ -43,6 +43,7 @@ jobs:
           pip install -r backend/requirements.txt
 
       - name: Django check
+        working-directory: backend
         env:
           DJANGO_SECRET_KEY: ${{ secrets.PRODUCTION_DJANGO_SECRET_KEY }}
           DEBUG: ${{ secrets.PRODUCTION_DEBUG }}
@@ -52,6 +53,7 @@ jobs:
           python manage.py check
 
       - name: Run tests
+        working-directory: backend
         env:
           DJANGO_SECRET_KEY: ${{ secrets.PRODUCTION_DJANGO_SECRET_KEY }}
           DEBUG: ${{ secrets.PRODUCTION_DEBUG }}
