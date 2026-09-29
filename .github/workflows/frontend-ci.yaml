@@ -1,6 +1,11 @@
 name: talanthub_frontend_ci
 
 on:
+  workflow_run:
+    workflows:
+      - talanthub_ci
+    types:
+      - completed
   push:
     branches:
       - main
@@ -21,7 +26,7 @@ env:
 
 jobs:
   test:
-    name: Test & build
+    name: Frontend Test & build
     runs-on: ubuntu-latest
 
     environment:
