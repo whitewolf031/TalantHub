@@ -6,12 +6,8 @@ on:
       - talanthub_ci
     types:
       - completed
+      
   push:
-    branches:
-      - main
-      - dev
-
-  pull_request:
     branches:
       - main
       - dev
