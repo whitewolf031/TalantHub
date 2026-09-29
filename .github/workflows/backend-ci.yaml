@@ -102,9 +102,10 @@ jobs:
           echo "======================================"
       
       - name: Build docker image
+        working-directory: backend
         run: |
           docker build \
-            -f backend/Dockerfile \
+            -f Dockerfile \
             -t "${{ steps.image.outputs.image }}" \
             .
 
