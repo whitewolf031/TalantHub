@@ -21,7 +21,7 @@ env:
 
 jobs:
   test:
-    name: Test & build
+    name: Backend Test & build
     runs-on: ubuntu-latest
 
     environment:
