@@ -32,8 +32,11 @@ class Announcement(models.Model):
     full_name = models.CharField(max_length=100, validators=[validate_full_name])
     age = models.PositiveSmallIntegerField()
     direction = models.CharField(max_length=150, verbose_name="Yo'nalish")
-    technologies = models.CharField(max_length=255, verbose_name="Texnologiyalar")
-
+    technologies = models.CharField(
+        max_length=1000,
+        verbose_name="Texnologiyalar"
+    )
+    
     telegram_username = models.CharField(
         max_length=33, validators=[validate_telegram_username]
     )
@@ -76,9 +79,10 @@ class Announcement(models.Model):
         return f"#{self.pk} {self.category.emoji} {self.full_name} ({self.get_status_display()})"
 
     def salary_display(self) -> str:
-        symbol = "so'm" if self.salary_currency == Currency.UZS else "$"
         amount = f"{self.salary_amount:,.0f}".replace(",", " ")
-        return f"{amount} {symbol}"
+        if self.salary_currency == Currency.USD:
+            return f"${amount}"
+        return f"{amount} so'm"
 
     def contact_time_display(self) -> str:
         return f"{self.contact_time_start.strftime('%H:%M')}–{self.contact_time_end.strftime('%H:%M')}"

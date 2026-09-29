@@ -9,7 +9,6 @@ from utils.texts import t
 
 router = Router(name="start")
 
-
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     user = await api_client.get_user(message.from_user.id)

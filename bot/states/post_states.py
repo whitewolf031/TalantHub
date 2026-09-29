@@ -7,7 +7,7 @@ class PostAnnouncement(StatesGroup):
     entering_age = State()
     entering_direction = State()
     entering_technologies = State()
-    entering_telegram_username = State()
+    # entering_telegram_username = State()
     entering_phone = State()
     entering_city_from = State()
     entering_city_looking = State()

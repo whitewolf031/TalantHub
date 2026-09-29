@@ -15,7 +15,6 @@ from utils.validators import (
     is_valid_name,
     is_valid_phone,
     is_valid_salary_amount,
-    is_valid_telegram_username,
     parse_contact_time,
 )
 
@@ -146,34 +145,32 @@ async def process_technologies(message: Message, state: FSMContext):
         await message.answer(t("ask_technologies", lang))
         return
 
-    await state.update_data(technologies=text)
-    await state.set_state(PostAnnouncement.entering_telegram_username)
+    # Telegram username so'ralmaydi — profildan avtomatik olinadi.
+    username = message.from_user.username
+    telegram_username = f"@{username}" if username else f"@id{message.from_user.id}"
 
-    suggestion = f"@{message.from_user.username}" if message.from_user.username else ""
-    prompt = t("ask_telegram_username", lang)
-    if suggestion:
-        prompt += f"\n\n{suggestion}"
-    await message.answer(prompt)
-
-
-# --- Telegram username ------------------------------------------------
-
-@router.message(PostAnnouncement.entering_telegram_username)
-async def process_telegram_username(message: Message, state: FSMContext):
-    data = await state.get_data()
-    lang = data.get("lang", "uz")
-
-    username = (message.text or "").strip()
-    if not is_valid_telegram_username(username):
-        await message.answer(t("invalid_telegram_username", lang))
-        return
-
-    if not username.startswith("@"):
-        username = f"@{username}"
-
-    await state.update_data(telegram_username=username)
+    await state.update_data(technologies=text, telegram_username=telegram_username)
     await state.set_state(PostAnnouncement.entering_phone)
     await message.answer(t("ask_phone", lang), reply_markup=phone_request_keyboard(lang))
+
+# # --- Telegram username ------------------------------------------------
+
+# @router.message(PostAnnouncement.entering_telegram_username)
+# async def process_telegram_username(message: Message, state: FSMContext):
+#     data = await state.get_data()
+#     lang = data.get("lang", "uz")
+
+#     username = (message.text or "").strip()
+#     if not is_valid_telegram_username(username):
+#         await message.answer(t("invalid_telegram_username", lang))
+#         return
+
+#     if not username.startswith("@"):
+#         username = f"@{username}"
+
+#     await state.update_data(telegram_username=username)
+#     await state.set_state(PostAnnouncement.entering_phone)
+#     await message.answer(t("ask_phone", lang), reply_markup=phone_request_keyboard(lang))
 
 
 # --- Telefon raqam ----------------------------------------------------------
@@ -312,20 +309,37 @@ async def process_purpose(message: Message, state: FSMContext):
     await message.answer(t("confirm_send", lang), reply_markup=yes_no_keyboard(lang))
 
 
+# Backend'dagi apps/announcements/services.py -> CATEGORY_ACTION_PHRASES bilan bir xil.
+CATEGORY_ACTION_PHRASES = {
+    "job_seeker": "ISH QIDIRMOQDA",
+    "mentor_needed": "USTOZ QIDIRMOQDA",
+    "employee_needed": "XODIM QIDIRMOQDA",
+    "partner_needed": "HAMKOR QIDIRMOQDA",
+    "student_needed": "SHOGIRD QIDIRMOQDA",
+}
+
+
 def _build_preview(data: dict) -> str:
-    currency_symbol = "so'm" if data.get("salary_currency") == "UZS" else "$"
+    action = CATEGORY_ACTION_PHRASES.get(data.get("category_key"), "E'LON")
+    title = f"🔥 {(data.get('direction') or '').upper()} {action}"
+
+    if data.get("salary_currency") == "USD":
+        salary = f"${data.get('salary_amount')}"
+    else:
+        salary = f"{data.get('salary_amount')} so'm"
+
     return (
-        f"👤 Ism: {data.get('full_name')}\n"
-        f"🎂 Yosh: {data.get('age')}\n"
-        f"💼 Yo'nalish: {data.get('direction')}\n"
-        f"🛠 Texnologiyalar: {data.get('technologies')}\n"
-        f"📍 Qaysi shahardan: {data.get('city_from')}\n"
-        f"🔎 Qaysi shaharda imkoniyat qidiradi: {data.get('city_looking')}\n"
-        f"💰 Oylik: {data.get('salary_amount')} {currency_symbol}\n"
-        f"⏰ Murojaat vaqti: {data.get('contact_time_start')}–{data.get('contact_time_end')}\n"
+        f"{title}\n\n"
+        f"👤 {data.get('full_name')}\n"
+        f"🎂 {data.get('age')} yosh\n"
+        f"📍 Location: {data.get('city_from')} dan\n"
+        f"💰 {salary}\n\n"
+        f"🛠 {data.get('technologies')}\n\n"
+        f"🌍 Hozirgi shaxar: {data.get('city_looking')}\n"
+        f"⏰ Murojaat vaqti: {data.get('contact_time_start')}–{data.get('contact_time_end')}\n\n"
+        f"🎯 Maqsad: {data.get('purpose')}\n\n"
         f"📱 Telefon: {data.get('phone_number')}\n"
-        f"💬 Telegram: {data.get('telegram_username')}\n"
-        f"🎯 Maqsad: {data.get('purpose')}"
+        f"💬 Telegram: {data.get('telegram_username')}"
     )
 
 

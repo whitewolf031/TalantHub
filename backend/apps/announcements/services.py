@@ -37,24 +37,32 @@ USER_MESSAGES = {
     "reason": {"uz": "Sabab", "en": "Reason", "ru": "Причина"},
 }
 
+CATEGORY_ACTION_PHRASES = {
+    "job_seeker": "ISH QIDIRMOQDA",
+    "mentor_needed": "USTOZ QIDIRMOQDA",
+    "employee_needed": "XODIM QIDIRMOQDA",
+    "partner_needed": "HAMKOR QIDIRMOQDA",
+    "student_needed": "SHOGIRD QIDIRMOQDA",
+}
 
 def build_channel_text(announcement) -> str:
     a = announcement
-    return (
-        f"{a.category.emoji} {a.category.name_uz.upper()}\n\n"
-        f"👤 Ism: {a.full_name}\n"
-        f"🎂 Yosh: {a.age}\n"
-        f"💼 Yo'nalish: {a.direction}\n"
-        f"🛠 Texnologiyalar: {a.technologies}\n"
-        f"📍 Qaysi shahardan: {a.city_from}\n"
-        f"🔎 Qaysi shaharda imkoniyat qidiradi: {a.city_looking}\n"
-        f"💰 Oylik: {a.salary_display()}\n"
-        f"⏰ Murojaat vaqti: {a.contact_time_display()}\n"
-        f"📱 Telefon: {a.phone_number}\n"
-        f"💬 Telegram: {a.telegram_username}\n"
-        f"🎯 Maqsad: {a.purpose}"
-    )
+    action = CATEGORY_ACTION_PHRASES.get(a.category.key, a.category.name_uz.upper())
+    title = f"🔥 {a.direction.upper()} {action}"
 
+    return (
+        f"{title}\n\n"
+        f"👤 {a.full_name}\n"
+        f"🎂 {a.age} yosh\n"
+        f"📍 Location: {a.city_from} dan\n"
+        f"💰 {a.salary_display()}\n\n"
+        f"🛠 {a.technologies}\n\n"
+        f"🌍 Hozirgi shaxar: {a.city_looking}\n"
+        f"⏰ Murojaat vaqti: {a.contact_time_display()}\n\n"
+        f"🎯 Maqsad: {a.purpose}\n\n"
+        f"📱 Telefon: {a.phone_number}\n"
+        f"💬 Telegram: {a.telegram_username}"
+    )
 
 def _telegram_call(method: str, payload: dict):
     """Telegram Bot API'ga so'rov. Muvaffaqiyatli bo'lsa `result`, aks holda None."""
