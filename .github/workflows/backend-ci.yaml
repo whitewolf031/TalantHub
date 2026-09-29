@@ -1,4 +1,4 @@
-name: talanthub_ci
+name: talanthub_backend_ci
 
 on:
   push:
