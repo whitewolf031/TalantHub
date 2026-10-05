@@ -3,16 +3,20 @@ import logging
 from aiogram import Bot
 from aiogram.types import User
 
-from config import ADMIN_IDS
+from config import MODERATION_GROUP_ID, MODERATION_TOPIC_ID
 from keyboards.admin import moderation_keyboard
 
 logger = logging.getLogger(__name__)
 
 
 async def notify_admins(bot: Bot, announcement: dict, sender: User) -> None:
-    """Yangi e'lonni barcha adminlarga tasdiqlash/rad etish tugmalari bilan yuboradi."""
-    if not ADMIN_IDS:
-        logger.warning("ADMIN_IDS bo'sh — e'lon adminlarga yuborilmadi (faqat web panelda ko'rinadi).")
+    """
+    Yangi e'lonni moderatsiya guruhidagi belgilangan mavzuga (topic) yuboradi.
+    ✅/❌ tugmasini FAQAT config.ADMIN_IDS ro'yxatidagilar bosa oladi —
+    buni handlers/admin.py tekshiradi (o'zgarishsiz qoladi).
+    """
+    if not MODERATION_GROUP_ID or not MODERATION_TOPIC_ID:
+        logger.warning("MODERATION_GROUP_ID / MODERATION_TOPIC_ID sozlanmagan.")
         return
 
     username = f"@{sender.username}" if sender.username else "—"
@@ -22,11 +26,12 @@ async def notify_admins(bot: Bot, announcement: dict, sender: User) -> None:
         f"👥 Yuboruvchi: {sender.full_name} ({username}), ID: {sender.id}"
     )
 
-    for admin_id in ADMIN_IDS:
-        try:
-            await bot.send_message(
-                admin_id, text, reply_markup=moderation_keyboard(announcement["id"])
-            )
-        except Exception:
-            # Admin botga /start bosmagan yoki botni bloklagan bo'lishi mumkin
-            logger.exception("Adminga (%s) xabar yuborib bo'lmadi", admin_id)
+    try:
+        await bot.send_message(
+            MODERATION_GROUP_ID,
+            text,
+            message_thread_id=MODERATION_TOPIC_ID,
+            reply_markup=moderation_keyboard(announcement["id"]),
+        )
+    except Exception:
+        logger.exception("Moderatsiya guruhiga (topicga) xabar yuborib bo'lmadi")
