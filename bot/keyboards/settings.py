@@ -1,15 +1,19 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from utils.texts import t
 
+LANGUAGE_BUTTONS = {
+    "🇺🇿 O'zbekcha": "uz",
+    "🇬🇧 English": "en",
+    "🇷🇺 Русский": "ru",
+}
 
-def settings_language_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🇺🇿 O'zbekcha", callback_data="setlang:uz"),
-                InlineKeyboardButton(text="🇬🇧 English", callback_data="setlang:en"),
-                InlineKeyboardButton(text="🇷🇺 Русский", callback_data="setlang:ru"),
-            ]
-        ]
+
+def language_reply_keyboard(lang: str) -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=name) for name in LANGUAGE_BUTTONS],
+            [KeyboardButton(text=t("btn_back", lang))],
+        ],
+        resize_keyboard=True,
     )

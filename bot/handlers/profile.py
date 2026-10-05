@@ -1,6 +1,7 @@
 from aiogram import Router
 from aiogram.types import Message
 
+from keyboards.main import back_keyboard
 from services import api_client
 from utils.texts import TEXTS, t
 
@@ -25,7 +26,10 @@ async def show_profile(message: Message):
     announcements = await api_client.get_my_announcements(message.from_user.id)
 
     if not announcements:
-        await message.answer(f"{t('profile_title', lang)}\n\n{t('profile_no_posts', lang)}")
+        await message.answer(
+            f"{t('profile_title', lang)}\n\n{t('profile_no_posts', lang)}",
+            reply_markup=back_keyboard(lang),
+        )
         return
 
     lines = [t("profile_title", lang), ""]
@@ -33,4 +37,4 @@ async def show_profile(message: Message):
         status_text = t(STATUS_KEY_MAP.get(item["status"], "status_pending"), lang)
         lines.append(f"• {item['category']} — {status_text}")
 
-    await message.answer("\n".join(lines))
+    await message.answer("\n".join(lines), reply_markup=back_keyboard(lang))

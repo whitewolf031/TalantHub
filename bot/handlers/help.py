@@ -2,6 +2,7 @@ from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
 
+from keyboards.main import back_keyboard
 from services import api_client
 from utils.texts import TEXTS, t
 
@@ -15,7 +16,7 @@ def _is_help_button(message: Message) -> bool:
 async def _send_help(message: Message):
     user = await api_client.get_user(message.from_user.id)
     lang = user.get("language", "uz") if user else "uz"
-    await message.answer(t("help_text", lang))
+    await message.answer(t("help_text", lang), reply_markup=back_keyboard(lang))
 
 
 router.message.register(_send_help, Command("help"))
