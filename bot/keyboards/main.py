@@ -1,5 +1,4 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
-
 from utils.texts import t
 
 
@@ -12,9 +11,11 @@ def main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
                 KeyboardButton(text=t("btn_contact_admin", lang)),
             ],
             [
-                KeyboardButton(text=t("btn_help", lang)),
-                KeyboardButton(text=t("btn_language", lang)),
+                KeyboardButton(text=t("btn_help", lang))
             ],
+            [
+                KeyboardButton(text=t("btn_language", lang))
+            ]
         ],
         resize_keyboard=True,
     )
