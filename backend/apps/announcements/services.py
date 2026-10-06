@@ -75,7 +75,7 @@ def build_channel_text(announcement) -> str:
         f"📍 Location: {a.city_from} dan",
         f"💰 {a.salary_display()}\n",
         f"🛠 {a.technologies}\n",
-        f"🌍 Hozirgi shaxar: {a.city_looking}",
+        f"🌍 Ish qidirayotgan shahar: {a.city_looking}",
         f"⏰ Murojaat vaqti: {a.contact_time_display()}\n",
         f"🎯 Maqsad: {a.purpose}\n",
         f"📱 Telefon: {a.phone_number}",

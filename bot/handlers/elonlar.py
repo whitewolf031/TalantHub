@@ -683,7 +683,7 @@ def _build_preview(data: dict) -> str:
         f"📍 Location: {data.get('city_from')} dan",
         f"💰 {salary}\n",
         f"🛠 {data.get('technologies')}\n",
-        f"🌍 Hozirgi shaxar: {data.get('city_looking')}",
+        f"🌍 Ish qidirayotgan shahar: {data.get('city_looking')}",
         f"⏰ Murojaat vaqti: {data.get('contact_time_start')}–{data.get('contact_time_end')}\n",
         f"🎯 Maqsad: {data.get('purpose')}\n",
         f"📱 Telefon: {data.get('phone_number')}",
