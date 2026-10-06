@@ -385,7 +385,7 @@ function AnnouncementModal({ announcement: a, categories, onClose, onApprove, on
     ["Yo'nalish", a.direction],
     ["Texnologiyalar", a.technologies],
     ["Qaysi shahardan", a.city_from],
-    ["Qidirilayotgan shahar", a.city_looking],
+    ["Ish qidirayotgan shahar", a.city_looking],
     ["Oylik", a.salary_display],
     ["Murojaat vaqti", a.contact_time_display],
     ["Telefon", a.phone_number],
@@ -528,7 +528,7 @@ function EditForm({ announcement: a, categories, onCancel, onSaved }) {
         <input value={form.city_from} onChange={set("city_from")} required />
       </label>
       <label>
-        Qidirilayotgan shahar
+        Ish qidirayotgan shahar
         <input value={form.city_looking} onChange={set("city_looking")} required />
       </label>
       <label>

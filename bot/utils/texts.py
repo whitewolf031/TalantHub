@@ -5,9 +5,9 @@ Yangi matn qo'shish uchun har uch tilga ham kalitni qo'shing.
 
 TEXTS = {
     "welcome": {
-        "uz": "👋 Assalomu alaykum, {name}! TalantHub botiga xush kelibsiz.",
-        "en": "👋 Hello, {name}! Welcome to TalantHub bot.",
-        "ru": "👋 Здравствуйте, {name}! Добро пожаловать в TalantHub бот.",
+        "uz": "👋 Assalomu alaykum, {name}! Talant24 botiga xush kelibsiz.",
+        "en": "👋 Hello, {name}! Welcome to Talant24 bot.",
+        "ru": "👋 Здравствуйте, {name}! Добро пожаловать в Talant24 бот.",
     },
     "choose_language": {
         "uz": "🌐 Tilni tanlang:",
@@ -39,7 +39,7 @@ TEXTS = {
 
     "help_text": {
         "uz": (
-            "ℹ️ TalantHub — ish, ustoz, xodim, hamkor va shogird topish uchun "
+            "ℹ️ Talant24 — ish, ustoz, xodim, hamkor va shogird topish uchun "
             "e'lon platformasi.\n\n"
             "📢 E'lon joylash — yangi e'lon yuborish\n"
             "👤 Profil — sizning e'lonlaringiz holati\n"
@@ -47,7 +47,7 @@ TEXTS = {
             "Har qanday vaqtda /cancel buyrug'i bilan jarayonni bekor qilishingiz mumkin."
         ),
         "en": (
-            "ℹ️ TalantHub — an announcement platform to find a job, mentor, "
+            "ℹ️ Talant24 — an announcement platform to find a job, mentor, "
             "employee, partner or student.\n\n"
             "📢 Post an ad — send a new announcement\n"
             "👤 Profile — status of your announcements\n"
@@ -55,7 +55,7 @@ TEXTS = {
             "You can cancel any process with /cancel."
         ),
         "ru": (
-            "ℹ️ TalantHub — платформа объявлений для поиска работы, "
+            "ℹ️ Talant24 — платформа объявлений для поиска работы, "
             "наставника, сотрудника, партнёра или ученика.\n\n"
             "📢 Разместить объявление — отправить новое объявление\n"
             "👤 Профиль — статус ваших объявлений\n"
@@ -114,19 +114,23 @@ TEXTS = {
         "ru": "❗️Номер телефона должен быть в формате +998XXXXXXXXX.",
     },
     "ask_city_from": {"uz": "📍 Qaysi shahardan siz?", "en": "📍 Which city are you from?", "ru": "📍 Из какого вы города?"},
-    "ask_city_looking": {"uz": "🔎 Qaysi shaharda imkoniyat qidiryapsiz?", "en": "🔎 Which city are you looking for opportunities in?", "ru": "🔎 В каком городе вы ищете возможность?"},
+    "ask_city_looking": {
+        "uz": "🔎 Ish qidirayotgan shahringizni kiriting:",
+        "en": "🔎 Which city are you looking for a job in?",
+        "ru": "🔎 В каком городе вы ищете работу?",
+    },
     "ask_salary_amount": {"uz": "💰 Kutilayotgan oylik miqdorini kiriting (faqat raqam):", "en": "💰 Enter the expected salary amount (numbers only):", "ru": "💰 Введите ожидаемую зарплату (только число):"},
     "invalid_salary": {"uz": "❗️Miqdor faqat raqam bo'lishi kerak.", "en": "❗️Amount must be a number.", "ru": "❗️Сумма должна быть числом."},
     "ask_salary_currency": {"uz": "💱 Valyutani tanlang:", "en": "💱 Choose currency:", "ru": "💱 Выберите валюту:"},
     "ask_contact_time": {
-        "uz": "⏰ Murojaat vaqtini aniq kiriting (masalan: 09:00-18:00):",
-        "en": "⏰ Enter exact contact time (e.g. 09:00-18:00):",
-        "ru": "⏰ Введите точное время для связи (например: 09:00-18:00):",
+        "uz": "⏰ Murojaat vaqtini kiriting (masalan: 9:00-18:00 yoki 09:00-18:00):",
+        "en": "⏰ Enter contact time (e.g. 9:00-18:00 or 09:00-18:00):",
+        "ru": "⏰ Введите время для связи (например: 9:00-18:00 или 09:00-18:00):",
     },
     "invalid_contact_time": {
-        "uz": "❗️Format noto'g'ri. Aniq vaqt oralig'ini kiriting, masalan: 09:00-18:00",
-        "en": "❗️Invalid format. Enter an exact time range, e.g. 09:00-18:00",
-        "ru": "❗️Неверный формат. Введите точный диапазон времени, например: 09:00-18:00",
+        "uz": "❗️Format noto'g'ri. Vaqt oralig'ini kiriting, masalan: 9:00-18:00 yoki 09:00-18:00",
+        "en": "❗️Invalid format. Enter a time range, e.g. 9:00-18:00 or 09:00-18:00",
+        "ru": "❗️Неверный формат. Введите диапазон времени, например: 9:00-18:00 или 09:00-18:00",
     },
     "ask_purpose": {"uz": "🎯 Maqsadingizni qisqacha yozing:", "en": "🎯 Briefly describe your purpose:", "ru": "🎯 Кратко опишите вашу цель:"},
     "preview_title": {"uz": "📋 E'loningiz shunday ko'rinadi:", "en": "📋 Your announcement preview:", "ru": "📋 Предпросмотр вашего объявления:"},

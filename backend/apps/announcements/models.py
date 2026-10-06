@@ -112,7 +112,7 @@ class PaymentSetting(models.Model):
     """Admin orqali o'zgartiriladigan to'lov (plastik karta) sozlamalari."""
 
     card_number = models.CharField(max_length=30, default="9860 0000 0000 0000", verbose_name="Karta raqami")
-    card_owner = models.CharField(max_length=150, default="TalantHub Admin", verbose_name="Karta egasi")
+    card_owner = models.CharField(max_length=150, default="Talant24 Admin", verbose_name="Karta egasi")
     amount = models.PositiveIntegerField(default=10000, verbose_name="Narx (so'm)")
     instruction_uz = models.TextField(
         default="To'lovni ushbu plastik kartaga o'tkazib, chek skrinshotini yuboring:",
