@@ -4,11 +4,25 @@ from .views import (
     AnnouncementCreateView,
     AnnouncementModerateView,
     LastAnnouncementStatusView,
+    PaymentModerateView,
+    PaymentSettingView,
+    RunSchedulerView,
+    SubmitReceiptView,
     UserAnnouncementListView,
 )
 
 urlpatterns = [
     path("", AnnouncementCreateView.as_view(), name="announcement-create"),
+    path(
+        "payment-settings/",
+        PaymentSettingView.as_view(),
+        name="announcement-payment-settings",
+    ),
+    path(
+        "run-scheduler/",
+        RunSchedulerView.as_view(),
+        name="announcement-run-scheduler",
+    ),
     path(
         "cooldown/<int:telegram_id>/",
         LastAnnouncementStatusView.as_view(),
@@ -28,5 +42,20 @@ urlpatterns = [
         "<int:pk>/reject/",
         AnnouncementModerateView.as_view(moderation="reject"),
         name="announcement-reject",
+    ),
+    path(
+        "<int:pk>/submit-receipt/",
+        SubmitReceiptView.as_view(),
+        name="announcement-submit-receipt",
+    ),
+    path(
+        "<int:pk>/approve-payment/",
+        PaymentModerateView.as_view(moderation="approve"),
+        name="announcement-approve-payment",
+    ),
+    path(
+        "<int:pk>/reject-payment/",
+        PaymentModerateView.as_view(moderation="reject"),
+        name="announcement-reject-payment",
     ),
 ]

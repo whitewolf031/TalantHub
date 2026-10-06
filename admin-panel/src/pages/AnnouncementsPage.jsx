@@ -9,6 +9,8 @@ import { formatDate, useDebounced } from "../utils.js";
 
 const TABS = [
   { key: "pending", label: "Kutilmoqda" },
+  { key: "payment_pending", label: "To'lov tekshiruvi" },
+  { key: "waiting_payment", label: "To'lov kutilmoqda" },
   { key: "approved", label: "Tasdiqlangan" },
   { key: "rejected", label: "Rad etilgan" },
   { key: "", label: "Hammasi" },
@@ -47,7 +49,7 @@ export default function AnnouncementsPage() {
   // Filtr o'zgarganda yoki yangi e'lon kelganda (stats o'zgarganda) ro'yxat yangilanadi
   useEffect(() => {
     load();
-  }, [load, stats?.pending, stats?.approved, stats?.rejected]);
+  }, [load, stats?.pending, stats?.payment_pending, stats?.waiting_payment, stats?.approved, stats?.rejected]);
 
   const afterChange = async () => {
     setOpenId(null);
@@ -57,6 +59,30 @@ export default function AnnouncementsPage() {
   };
 
   const approve = async (a) => {
+    if (a.status === "payment_pending") {
+      if (!window.confirm(`«${a.full_name}»ning to'lovi tasdiqlanib, e'lon kanalga yuboriladi. Tasdiqlaysizmi?`)) return;
+      try {
+        await api.approvePayment(a.id);
+        toast("To'lov tasdiqlandi va e'lon kanalga yuborildi");
+      } catch (err) {
+        toast(err.message, "error");
+      }
+      afterChange();
+      return;
+    }
+
+    if (a.is_premium && a.status === "pending") {
+      if (!window.confirm(`«${a.full_name}» e'loni ma'qullanadi va foydalanuvchiga to'lov so'rovi yuboriladi. Tasdiqlaysizmi?`)) return;
+      try {
+        await api.approveAnnouncement(a.id);
+        toast("E'lon ma'qullandi, to'lov so'rovi yuborildi");
+      } catch (err) {
+        toast(err.message, "error");
+      }
+      afterChange();
+      return;
+    }
+
     if (!window.confirm(`«${a.full_name}» e'loni kanalga yuboriladi. Tasdiqlaysizmi?`)) return;
     try {
       await api.approveAnnouncement(a.id);
@@ -69,8 +95,13 @@ export default function AnnouncementsPage() {
 
   const reject = async (a, reason) => {
     try {
-      await api.rejectAnnouncement(a.id, reason);
-      toast("E'lon rad etildi");
+      if (a.status === "payment_pending") {
+        await api.rejectPayment(a.id, reason);
+        toast("To'lov rad etildi");
+      } else {
+        await api.rejectAnnouncement(a.id, reason);
+        toast("E'lon rad etildi");
+      }
     } catch (err) {
       toast(err.message, "error");
     }
@@ -162,6 +193,21 @@ export default function AnnouncementsPage() {
                   <td>#{a.id}</td>
                   <td>
                     {a.category.emoji} {a.category.name_uz}
+                    {a.is_premium && (
+                      <span
+                        style={{
+                          marginLeft: "6px",
+                          fontSize: "11px",
+                          background: "#e0e7ff",
+                          color: "#3730a3",
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        💎 Premium
+                      </span>
+                    )}
                   </td>
                   <td>
                     <strong>{a.full_name}</strong>
@@ -181,10 +227,14 @@ export default function AnnouncementsPage() {
                     <button className="btn btn-ghost" onClick={() => setOpenId(a.id)}>
                       Ko'rish
                     </button>
-                    {a.status === "pending" && (
+                    {(a.status === "pending" || a.status === "payment_pending") && (
                       <>
                         <button className="btn btn-ok" onClick={() => approve(a)}>
-                          Tasdiqlash
+                          {a.status === "payment_pending"
+                            ? "To'lovni tasdiqlash"
+                            : a.is_premium
+                            ? "Ma'qullash"
+                            : "Tasdiqlash"}
                         </button>
                         <button className="btn btn-danger-outline" onClick={() => setRejecting(a)}>
                           Rad etish
@@ -242,7 +292,23 @@ function RejectModal({ announcement, onClose, onConfirm }) {
 }
 
 function AnnouncementModal({ announcement: a, categories, onClose, onApprove, onReject, onDelete, onSaved }) {
+  const toast = useToast();
   const [editing, setEditing] = useState(false);
+  const [deletingResume, setDeletingResume] = useState(false);
+
+  const handleDeleteResume = async () => {
+    if (!window.confirm("Rostdan ham ushbu rezyume faylini serverdan o'chirmoqchimisiz?")) return;
+    setDeletingResume(true);
+    try {
+      await api.deleteResume(a.id);
+      toast("Rezyume fayli muvaffaqiyatli o'chirildi");
+      onSaved();
+    } catch (err) {
+      toast(err.message, "error");
+    } finally {
+      setDeletingResume(false);
+    }
+  };
 
   if (editing) {
     return (
@@ -262,6 +328,58 @@ function AnnouncementModal({ announcement: a, categories, onClose, onApprove, on
 
   const rows = [
     ["Turi", `${a.category.emoji} ${a.category.name_uz}`],
+    ["Tarif", a.is_premium ? "💎 Premium (Pullik)" : "Oddiy (Bepul)"],
+  ];
+
+  if (a.is_premium) {
+    rows.push(["Chiqarilish soni", `${a.post_count || 0} / 4 marta`]);
+    if (a.next_publish_date) rows.push(["Keyingi chiqarilish", formatDate(a.next_publish_date)]);
+    if (a.linkedin_url) {
+      rows.push([
+        "LinkedIn",
+        <a href={a.linkedin_url} target="_blank" rel="noreferrer" key="linkedin">
+          {a.linkedin_url}
+        </a>,
+      ]);
+    }
+    if (a.portfolio_url) {
+      rows.push([
+        "Portfolio",
+        <a href={a.portfolio_url} target="_blank" rel="noreferrer" key="portfolio">
+          {a.portfolio_url}
+        </a>,
+      ]);
+    }
+    if (a.resume_file_url) {
+      rows.push([
+        "Rezyume fayli",
+        <div key="resume" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <a href={a.resume_file_url} target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ padding: "4px 8px" }}>
+            📄 Yuklab olish
+          </a>
+          <button className="btn btn-danger-outline" style={{ padding: "4px 8px" }} onClick={handleDeleteResume} disabled={deletingResume}>
+            🗑 Rezyumeni o'chirish
+          </button>
+        </div>,
+      ]);
+    } else if (a.resume_deleted_at) {
+      rows.push(["Rezyume fayli", <span className="muted" key="resume-del">Rezyume o'chirilgan ({formatDate(a.resume_deleted_at)})</span>]);
+    }
+    if (a.payment_receipt_url) {
+      rows.push([
+        "To'lov cheki",
+        <a href={a.payment_receipt_url} target="_blank" rel="noreferrer" key="receipt">
+          <img
+            src={a.payment_receipt_url}
+            alt="To'lov cheki"
+            style={{ maxWidth: "200px", maxHeight: "200px", objectFit: "contain", border: "1px solid #cbd5e1", borderRadius: "6px", marginTop: "4px" }}
+          />
+        </a>,
+      ]);
+    }
+  }
+
+  rows.push(
     ["Ism", a.full_name],
     ["Yosh", a.age],
     ["Yo'nalish", a.direction],
@@ -274,8 +392,9 @@ function AnnouncementModal({ announcement: a, categories, onClose, onApprove, on
     ["Telegram", a.telegram_username],
     ["Maqsad", a.purpose],
     ["Yuboruvchi", `${a.user.first_name || "—"} ${a.user.username ? `(@${a.user.username})` : ""} · ID ${a.user.telegram_id}`],
-    ["Kelgan vaqti", formatDate(a.created_at)],
-  ];
+    ["Kelgan vaqti", formatDate(a.created_at)]
+  );
+
   if (a.status === "approved") rows.push(["Tasdiqlangan vaqti", formatDate(a.approved_at)]);
   if (a.status === "rejected") {
     rows.push(["Rad etilgan vaqti", formatDate(a.rejected_at)]);
@@ -286,6 +405,11 @@ function AnnouncementModal({ announcement: a, categories, onClose, onApprove, on
     <Modal title={`E'lon #${a.id}`} onClose={onClose} wide>
       <div className="modal-status">
         <StatusBadge status={a.status} />
+        {a.is_premium && (
+          <span style={{ fontSize: "12px", background: "#e0e7ff", color: "#3730a3", padding: "3px 8px", borderRadius: "4px", fontWeight: "600" }}>
+            💎 Premium
+          </span>
+        )}
         {a.user.is_blocked && <span className="badge badge-rejected">Foydalanuvchi bloklangan</span>}
       </div>
 
@@ -305,13 +429,17 @@ function AnnouncementModal({ announcement: a, categories, onClose, onApprove, on
         <button className="btn btn-ghost" onClick={() => setEditing(true)}>
           Tahrirlash
         </button>
-        {a.status === "pending" && (
+        {(a.status === "pending" || a.status === "payment_pending") && (
           <>
             <button className="btn btn-danger-outline" onClick={onReject}>
-              Rad etish
+              {a.status === "payment_pending" ? "To'lovni rad etish" : "Rad etish"}
             </button>
             <button className="btn btn-ok" onClick={onApprove}>
-              Tasdiqlash va kanalga yuborish
+              {a.status === "payment_pending"
+                ? "To'lovni tasdiqlash va kanalga chiqarish"
+                : a.is_premium
+                ? "Ma'qullash (To'lov so'rash)"
+                : "Tasdiqlash va kanalga yuborish"}
             </button>
           </>
         )}

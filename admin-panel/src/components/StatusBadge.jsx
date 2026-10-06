@@ -1,5 +1,7 @@
 const LABELS = {
   pending: "Kutilmoqda",
+  waiting_payment: "To'lov kutilmoqda",
+  payment_pending: "To'lov tekshirilmoqda",
   approved: "Tasdiqlangan",
   rejected: "Rad etilgan",
 };

@@ -27,17 +27,38 @@ async def moderate(callback: CallbackQuery):
         return
 
     if status_code == 200:
-        verdict = "✅ Tasdiqlandi va kanalga yuborildi" if action == "approve" else "❌ Rad etildi"
-        await callback.message.edit_text(
-            f"{callback.message.text}\n\n{verdict} — {callback.from_user.full_name}",
-            reply_markup=None,
-        )
+        if action == "approve":
+            if body.get("status") == "waiting_payment":
+                verdict = "✅ E'lon ma'qullandi, to'lov kutilmoqda"
+            else:
+                verdict = "✅ Tasdiqlandi va kanalga yuborildi"
+        elif action == "approve-payment":
+            verdict = "✅ To'lov tasdiqlandi va kanalga yuborildi"
+        elif action == "reject-payment":
+            verdict = "❌ To'lov rad etildi"
+        else:
+            verdict = "❌ Rad etildi"
+
+        formatted_verdict = f"\n\n{verdict} — {callback.from_user.full_name}"
+        if callback.message.caption is not None:
+            new_caption = f"{callback.message.caption}{formatted_verdict}"[:1024]
+            await callback.message.edit_caption(caption=new_caption, reply_markup=None)
+        else:
+            await callback.message.edit_text(
+                f"{callback.message.text}{formatted_verdict}",
+                reply_markup=None,
+            )
         await callback.answer(verdict)
     elif status_code == 409:
-        await callback.message.edit_text(
-            f"{callback.message.text}\n\nℹ️ Bu e'lon allaqachon ko'rib chiqilgan.",
-            reply_markup=None,
-        )
+        already_msg = "\n\nℹ️ Bu e'lon allaqachon ko'rib chiqilgan."
+        if callback.message.caption is not None:
+            new_caption = f"{callback.message.caption}{already_msg}"[:1024]
+            await callback.message.edit_caption(caption=new_caption, reply_markup=None)
+        else:
+            await callback.message.edit_text(
+                f"{callback.message.text}{already_msg}",
+                reply_markup=None,
+            )
         await callback.answer("Allaqachon ko'rib chiqilgan.", show_alert=True)
     elif status_code == 502:
         await callback.answer(

@@ -5,6 +5,7 @@ import AnnouncementsPage from "./pages/AnnouncementsPage.jsx";
 import CategoriesPage from "./pages/CategoriesPage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
+import PaymentSettingsPage from "./pages/PaymentSettingsPage.jsx";
 import UsersPage from "./pages/UsersPage.jsx";
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="announcements" element={<AnnouncementsPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="users" element={<UsersPage />} />
+        <Route path="payment-settings" element={<PaymentSettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

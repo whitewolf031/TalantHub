@@ -10,3 +10,15 @@ def moderation_keyboard(announcement_id: int) -> InlineKeyboardMarkup:
             ]
         ]
     )
+
+
+def payment_moderation_keyboard(announcement_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ To'lovni tasdiqlash", callback_data=f"adm:approve-payment:{announcement_id}"),
+                InlineKeyboardButton(text="❌ Rad etish", callback_data=f"adm:reject-payment:{announcement_id}"),
+            ]
+        ]
+    )
+

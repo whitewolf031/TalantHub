@@ -17,6 +17,8 @@ class Currency(models.TextChoices):
 
 class AnnouncementStatus(models.TextChoices):
     PENDING = "pending", "Kutilmoqda"
+    WAITING_PAYMENT = "waiting_payment", "To'lov kutilmoqda"
+    PAYMENT_PENDING = "payment_pending", "To'lov tekshirilmoqda"
     APPROVED = "approved", "Tasdiqlangan"
     REJECTED = "rejected", "Rad etilgan"
 
@@ -58,12 +60,30 @@ class Announcement(models.Model):
     purpose = models.TextField(verbose_name="Maqsad")
 
     status = models.CharField(
-        max_length=10,
+        max_length=20,
         choices=AnnouncementStatus.choices,
         default=AnnouncementStatus.PENDING,
     )
     channel_message_id = models.BigIntegerField(null=True, blank=True)
     reject_reason = models.CharField(max_length=255, blank=True, default="")
+
+    # Pulli (Premium) e'lon maydonlari
+    is_premium = models.BooleanField(default=False, verbose_name="Pullik e'lon")
+    linkedin_url = models.CharField(max_length=500, blank=True, default="", verbose_name="LinkedIn profil")
+    portfolio_url = models.CharField(max_length=500, blank=True, default="", verbose_name="Portfolio")
+    resume_file = models.FileField(
+        upload_to="resumes/%Y/%m/", blank=True, null=True, verbose_name="Rezyume fayli"
+    )
+    payment_receipt = models.FileField(
+        upload_to="receipts/%Y/%m/", blank=True, null=True, verbose_name="To'lov cheki"
+    )
+    post_count = models.PositiveSmallIntegerField(default=0, verbose_name="Chiqarilgan soni")
+    next_publish_date = models.DateTimeField(
+        null=True, blank=True, verbose_name="Keyingi chiqarilish vaqti"
+    )
+    resume_deleted_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Rezyume o'chirilgan vaqti"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -86,3 +106,41 @@ class Announcement(models.Model):
 
     def contact_time_display(self) -> str:
         return f"{self.contact_time_start.strftime('%H:%M')}–{self.contact_time_end.strftime('%H:%M')}"
+
+
+class PaymentSetting(models.Model):
+    """Admin orqali o'zgartiriladigan to'lov (plastik karta) sozlamalari."""
+
+    card_number = models.CharField(max_length=30, default="9860 0000 0000 0000", verbose_name="Karta raqami")
+    card_owner = models.CharField(max_length=150, default="TalantHub Admin", verbose_name="Karta egasi")
+    amount = models.PositiveIntegerField(default=10000, verbose_name="Narx (so'm)")
+    instruction_uz = models.TextField(
+        default="To'lovni ushbu plastik kartaga o'tkazib, chek skrinshotini yuboring:",
+        verbose_name="Ko'rsatma (UZ)",
+    )
+    instruction_en = models.TextField(
+        default="Transfer the payment to this card and send the receipt screenshot:",
+        verbose_name="Ko'rsatma (EN)",
+    )
+    instruction_ru = models.TextField(
+        default="Переведите оплату на эту карту и отправьте скриншот чека:",
+        verbose_name="Ko'rsatma (RU)",
+    )
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "To'lov sozlamasi"
+        verbose_name_plural = "To'lov sozlamalari"
+
+    def __str__(self):
+        return f"{self.card_number} ({self.card_owner}) - {self.amount} so'm"
+
+    @classmethod
+    def get_active(cls):
+        setting = cls.objects.filter(is_active=True).first()
+        if not setting:
+            setting = cls.objects.create()
+        return setting
+

@@ -71,6 +71,7 @@ export default function Layout() {
           </NavLink>
           <NavLink to="/categories">E'lon turlari</NavLink>
           <NavLink to="/users">Foydalanuvchilar</NavLink>
+          <NavLink to="/payment-settings">💳 To'lov sozlamalari</NavLink>
         </nav>
 
         <div className="sidebar-foot">

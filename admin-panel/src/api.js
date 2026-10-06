@@ -82,6 +82,14 @@ export const api = {
   approveAnnouncement: (id) => request(`/announcements/${id}/approve/`, { method: "POST", body: {} }),
   rejectAnnouncement: (id, reason) =>
     request(`/announcements/${id}/reject/`, { method: "POST", body: { reason } }),
+  approvePayment: (id) => request(`/announcements/${id}/approve-payment/`, { method: "POST", body: {} }),
+  rejectPayment: (id, reason) =>
+    request(`/announcements/${id}/reject-payment/`, { method: "POST", body: { reason } }),
+  deleteResume: (id) => request(`/announcements/${id}/delete-resume/`, { method: "POST", body: {} }),
+
+  paymentSettings: () => request("/payment-settings/"),
+  updatePaymentSettings: (body) => request("/payment-settings/", { method: "PATCH", body }),
+
 
   categories: () => request("/categories/"),
   createCategory: (body) => request("/categories/", { method: "POST", body }),
