@@ -9,6 +9,9 @@ BACKEND_API_URL = os.getenv("BACKEND_API_URL", "http://web-admin:8000/api")
 INTERNAL_API_KEY = os.getenv("INTERNAL_API_KEY", "change-me-internal-key")
 MODERATION_GROUP_ID = int(os.getenv("MODERATION_GROUP_ID", "0") or 0)
 MODERATION_TOPIC_ID = int(os.getenv("MODERATION_TOPIC_ID", "0") or 0)
+PAYMENTS_TOPIC_ID = int(os.getenv("PAYMENTS_TOPIC_ID", "0") or 0) or MODERATION_TOPIC_ID
+CONTACT_TOPIC_ID = int(os.getenv("CONTACT_TOPIC_ID", "0") or 0) or MODERATION_TOPIC_ID
+
 
 # Moderator (admin) Telegram ID'lari, vergul bilan: 123456789,987654321
 # Yangi e'lonlar shu adminlarga yuboriladi va faqat ular tasdiqlay/rad eta oladi.

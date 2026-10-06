@@ -7,8 +7,14 @@ def main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text=t("btn_new_post", lang))],
-            [KeyboardButton(text=t("btn_profile", lang)), KeyboardButton(text=t("btn_help", lang))],
-            [KeyboardButton(text=t("btn_language", lang))],
+            [
+                KeyboardButton(text=t("btn_profile", lang)),
+                KeyboardButton(text=t("btn_contact_admin", lang)),
+            ],
+            [
+                KeyboardButton(text=t("btn_help", lang)),
+                KeyboardButton(text=t("btn_language", lang)),
+            ],
         ],
         resize_keyboard=True,
     )

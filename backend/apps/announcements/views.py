@@ -3,15 +3,26 @@ from datetime import timedelta
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import status
+from rest_framework import parsers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.users.models import BotUser
 
-from .models import Announcement
-from .serializers import AnnouncementCreateSerializer, AnnouncementReadSerializer
-from .services import approve_announcement, reject_announcement
+from .models import Announcement, PaymentSetting
+from .serializers import (
+    AnnouncementCreateSerializer,
+    AnnouncementReadSerializer,
+    PaymentSettingSerializer,
+)
+from .services import (
+    approve_announcement,
+    approve_payment,
+    process_scheduled_posts_and_cleanup,
+    reject_announcement,
+    reject_payment,
+    submit_receipt,
+)
 
 
 def _cooldown_remaining(user):
@@ -30,6 +41,7 @@ class AnnouncementCreateView(APIView):
     Yangi e'lon yaratadi (status=pending). Bloklangan foydalanuvchiga 403,
     cooldown tugamagan bo'lsa 429 qaytaradi.
     """
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def post(self, request):
         user = BotUser.objects.filter(telegram_id=request.data.get("telegram_id")).first()
@@ -52,6 +64,23 @@ class AnnouncementCreateView(APIView):
             AnnouncementReadSerializer(announcement).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class PaymentSettingView(APIView):
+    """GET /api/announcements/payment-settings/ — bot to'lov ma'lumotlarini olishi uchun."""
+
+    def get(self, request):
+        setting = PaymentSetting.get_active()
+        return Response(PaymentSettingSerializer(setting).data)
+
+
+class RunSchedulerView(APIView):
+    """POST /api/announcements/run-scheduler/ — har 7 kunda avto-post va 30 kunda rezyume tozalash."""
+
+    def post(self, request):
+        result = process_scheduled_posts_and_cleanup()
+        return Response(result)
+
 
 
 class LastAnnouncementStatusView(APIView):
@@ -114,3 +143,58 @@ class AnnouncementModerateView(APIView):
                 status=status.HTTP_502_BAD_GATEWAY,
             )
         return Response(AnnouncementReadSerializer(announcement).data)
+
+
+class SubmitReceiptView(APIView):
+    """
+    POST /api/announcements/<id>/submit-receipt/
+    Foydalanuvchi to'lov cheki skrinshotini yuboradi.
+    """
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+
+    def post(self, request, pk):
+        announcement = get_object_or_404(Announcement, pk=pk)
+        receipt_file = request.FILES.get("payment_receipt")
+        if not receipt_file:
+            return Response(
+                {"detail": "payment_receipt file required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        announcement, code = submit_receipt(pk, receipt_file)
+        if code == "invalid_status":
+            return Response(
+                {"detail": "invalid_status", "status": announcement.status},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return Response(AnnouncementReadSerializer(announcement).data)
+
+
+class PaymentModerateView(APIView):
+    """
+    POST /api/announcements/<id>/approve-payment/
+    POST /api/announcements/<id>/reject-payment/
+    """
+    moderation = None  # "approve" | "reject"
+
+    def post(self, request, pk):
+        get_object_or_404(Announcement, pk=pk)
+
+        if self.moderation == "approve":
+            announcement, code = approve_payment(pk)
+        else:
+            announcement, code = reject_payment(pk, request.data.get("reason", ""))
+
+        if code == "invalid_status":
+            return Response(
+                {"detail": "invalid_status", "status": announcement.status},
+                status=status.HTTP_409_CONFLICT,
+            )
+        if code == "channel_failed":
+            return Response(
+                {"detail": "channel_failed"},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+        return Response(AnnouncementReadSerializer(announcement).data)
+

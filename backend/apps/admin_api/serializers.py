@@ -42,6 +42,9 @@ class AdminBotUserSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "telegram_id", "created_at", "last_activity_at"]
 
 
+from apps.announcements.models import Announcement, PaymentSetting
+
+
 class AdminAnnouncementSerializer(serializers.ModelSerializer):
     """Ro'yxat va batafsil ko'rish uchun (o'qish)."""
 
@@ -49,6 +52,18 @@ class AdminAnnouncementSerializer(serializers.ModelSerializer):
     user = UserBriefSerializer(read_only=True)
     salary_display = serializers.CharField(read_only=True)
     contact_time_display = serializers.CharField(read_only=True)
+    resume_file_url = serializers.SerializerMethodField()
+    payment_receipt_url = serializers.SerializerMethodField()
+
+    def get_resume_file_url(self, obj):
+        if obj.resume_file:
+            return obj.resume_file.url
+        return None
+
+    def get_payment_receipt_url(self, obj):
+        if obj.payment_receipt:
+            return obj.payment_receipt.url
+        return None
 
     class Meta:
         model = Announcement
@@ -57,8 +72,10 @@ class AdminAnnouncementSerializer(serializers.ModelSerializer):
             "technologies", "telegram_username", "phone_number", "city_from",
             "city_looking", "salary_amount", "salary_currency", "salary_display",
             "contact_time_start", "contact_time_end", "contact_time_display",
-            "purpose", "status", "reject_reason", "channel_message_id",
-            "created_at", "approved_at", "rejected_at",
+            "purpose", "is_premium", "linkedin_url", "portfolio_url",
+            "resume_file_url", "payment_receipt_url", "post_count",
+            "next_publish_date", "resume_deleted_at", "status", "reject_reason",
+            "channel_message_id", "created_at", "approved_at", "rejected_at",
         ]
 
 
@@ -73,7 +90,7 @@ class AdminAnnouncementWriteSerializer(serializers.ModelSerializer):
             "category", "full_name", "age", "direction", "technologies",
             "telegram_username", "phone_number", "city_from", "city_looking",
             "salary_amount", "salary_currency", "contact_time_start",
-            "contact_time_end", "purpose",
+            "contact_time_end", "purpose", "is_premium", "linkedin_url", "portfolio_url",
         ]
 
     def validate_age(self, value):
@@ -89,3 +106,14 @@ class AdminAnnouncementWriteSerializer(serializers.ModelSerializer):
         except Exception as exc:  # django ValidationError -> DRF
             raise serializers.ValidationError({"contact_time_end": exc.messages})
         return attrs
+
+
+class AdminPaymentSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PaymentSetting
+        fields = [
+            "id", "card_number", "card_owner", "amount",
+            "instruction_uz", "instruction_en", "instruction_ru",
+            "is_active", "updated_at",
+        ]
+

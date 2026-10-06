@@ -26,3 +26,46 @@ def currency_keyboard(lang: str) -> InlineKeyboardMarkup:
             ]
         ]
     )
+
+
+def plan_selection_keyboard(lang: str, amount: int = 10000) -> InlineKeyboardMarkup:
+    formatted_amount = f"{amount:,}".replace(",", " ")
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("btn_plan_free", lang), callback_data="plan:free"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("btn_plan_premium", lang, amount=formatted_amount),
+                    callback_data="plan:premium",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("btn_cancel", lang), callback_data="post:cancel"
+                )
+            ],
+        ]
+    )
+
+
+def portfolio_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("btn_no_portfolio", lang), callback_data="portfolio:none"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("btn_cancel", lang), callback_data="post:cancel"
+                )
+            ],
+        ]
+    )
+
+

@@ -30,11 +30,12 @@ TEXTS = {
     "btn_language": {"uz": "🌐 Tilni o'zgartirish", "en": "🌐 Change language", "ru": "🌐 Сменить язык"},
     "btn_back": {"uz": "⬅️ Orqaga", "en": "⬅️ Back", "ru": "⬅️ Назад"},
     "btn_help": {"uz": "ℹ️ Yordam", "en": "ℹ️ Help", "ru": "ℹ️ Помощь"},
-    # "btn_back": {"uz": "⬅️ Orqaga", "en": "⬅️ Back", "ru": "⬅️ Назад"},
+    "btn_contact_admin": {"uz": "✍️ Admin bilan bog'lanish", "en": "✍️ Contact Admin", "ru": "✍️ Связаться с админом"},
     "btn_cancel": {"uz": "🚫 Bekor qilish", "en": "🚫 Cancel", "ru": "🚫 Отмена"},
     "btn_yes": {"uz": "✅ Ha", "en": "✅ Yes", "ru": "✅ Да"},
     "btn_no": {"uz": "❌ Yo'q", "en": "❌ No", "ru": "❌ Нет"},
     "btn_share_phone": {"uz": "📱 Raqamni yuborish", "en": "📱 Share phone number", "ru": "📱 Отправить номер"},
+
 
     "help_text": {
         "uz": (
@@ -129,12 +130,171 @@ TEXTS = {
     },
     "ask_purpose": {"uz": "🎯 Maqsadingizni qisqacha yozing:", "en": "🎯 Briefly describe your purpose:", "ru": "🎯 Кратко опишите вашу цель:"},
     "preview_title": {"uz": "📋 E'loningiz shunday ko'rinadi:", "en": "📋 Your announcement preview:", "ru": "📋 Предпросмотр вашего объявления:"},
+    "choose_plan": {
+        "uz": (
+            "🎯 E'lon tarifini tanlang:\n\n"
+            "🌟 <b>Oddiy (Bepul)</b> — e'lon 1 marta kanalga chiqariladi.\n\n"
+            "💎 <b>Premium (Pullik — {amount} so'm)</b>:\n"
+            "• LinkedIn va Portfolio havolalari\n"
+            "• Rezyume (PDF/DOC) fayli biriktiriladi\n"
+            "• 1 oy davomida 4 marta (har hafta 1 martadan) kanalga avtomatik chiqariladi!"
+        ),
+        "en": (
+            "🎯 Choose announcement plan:\n\n"
+            "🌟 <b>Standard (Free)</b> — published once to the channel.\n\n"
+            "💎 <b>Premium ({amount} UZS)</b>:\n"
+            "• LinkedIn and Portfolio links\n"
+            "• Resume (PDF/DOC) attached\n"
+            "• Published 4 times a month (weekly) automatically!"
+        ),
+        "ru": (
+            "🎯 Выберите тариф объявления:\n\n"
+            "🌟 <b>Обычный (Бесплатно)</b> — публикуется 1 раз в канале.\n\n"
+            "💎 <b>Премиум ({amount} сум)</b>:\n"
+            "• Ссылки на LinkedIn и Портфолио\n"
+            "• Прикрепление резюме (PDF/DOC)\n"
+            "• Публикуется 4 раза в месяц (каждую неделю) автоматически!"
+        ),
+    },
+    "btn_plan_free": {"uz": "🌟 Oddiy (Bepul)", "en": "🌟 Standard (Free)", "ru": "🌟 Обычный (Бесплатно)"},
+    "btn_plan_premium": {"uz": "💎 Premium ({amount} so'm)", "en": "💎 Premium ({amount} UZS)", "ru": "💎 Премиум ({amount} сум)"},
+
+    "ask_linkedin": {
+        "uz": "🔗 LinkedIn profilingiz havolasini yuboring (masalan: https://linkedin.com/in/...):",
+        "en": "🔗 Enter your LinkedIn profile link (e.g. https://linkedin.com/in/...):",
+        "ru": "🔗 Отправьте ссылку на ваш профиль в LinkedIn (например: https://linkedin.com/in/...):",
+    },
+    "invalid_linkedin": {
+        "uz": "❗️Noto'g'ri havola. Iltimos, to'liq LinkedIn URL manzilini kiriting.",
+        "en": "❗️Invalid link. Please enter a valid LinkedIn URL.",
+        "ru": "❗️Некорректная ссылка. Введите правильный URL профиля LinkedIn.",
+    },
+    "ask_portfolio": {
+        "uz": "💼 Portfolio havolangizni yuboring (GitHub, Behance, shaxsiy sayt va h.k.) yoki yo'q bo'lsa pastdagi tugmani bosing / 'yo'q' deb yozing:",
+        "en": "💼 Enter your portfolio link (GitHub, Behance, website, etc.) or click the button below / type 'no':",
+        "ru": "💼 Отправьте ссылку на ваше портфолио (GitHub, Behance, сайт и т.д.) или нажмите кнопку ниже / напишите 'нет':",
+    },
+    "btn_no_portfolio": {
+        "uz": "❌ Yo'q (Portfolio mavjud emas)",
+        "en": "❌ None (No portfolio)",
+        "ru": "❌ Нет (Портфолио отсутствует)",
+    },
+    "invalid_portfolio": {
+        "uz": "❗️Noto'g'ri havola. Iltimos, to'liq URL manzil kiriting (masalan: https://...) yoki yo'q bo'lsa 'yo'q' deb yozing.",
+        "en": "❗️Invalid link. Please enter a valid URL (e.g. https://...) or type 'no'.",
+        "ru": "❗️Некорректная ссылка. Введите правильный URL (например: https://...) или напишите 'нет'.",
+    },
+    "ask_resume": {
+        "uz": "📄 Rezyume faylingizni yuboring (Faqat PDF yoki DOC/DOCX formatda, maksimal 2 MB):",
+        "en": "📄 Send your resume file (PDF or DOC/DOCX only, max 2 MB):",
+        "ru": "📄 Отправьте файл резюме (только PDF или DOC/DOCX, макс. 2 МБ):",
+    },
+    "invalid_resume": {
+        "uz": "❗️Faqat PDF yoki DOC/DOCX formatdagi fayl yuboring (hajmi 2 MB dan oshmasin).",
+        "en": "❗️Only PDF or DOC/DOCX files are accepted (max 2 MB).",
+        "ru": "❗️Принимаются только файлы PDF или DOC/DOCX (макс. 2 МБ).",
+    },
+    "payment_instruction": {
+        "uz": (
+            "💳 <b>To'lov ma'lumotlari</b>\n\n"
+            "Plastik karta: <code>{card_number}</code>\n"
+            "Karta egasi: <b>{card_owner}</b>\n"
+            "To'lov summasi: <b>{amount} so'm</b>\n\n"
+            "ℹ️ {instruction}\n\n"
+            "Iltimos, to'lov cheki skrinshotini (rasm yoki fayl ko'rinishida) shu yerga yuboring 👇"
+        ),
+        "en": (
+            "💳 <b>Payment Details</b>\n\n"
+            "Card number: <code>{card_number}</code>\n"
+            "Card holder: <b>{card_owner}</b>\n"
+            "Amount: <b>{amount} UZS</b>\n\n"
+            "ℹ️ {instruction}\n\n"
+            "Please send the receipt screenshot (as photo or file) here 👇"
+        ),
+        "ru": (
+            "💳 <b>Данные для оплаты</b>\n\n"
+            "Номер карты: <code>{card_number}</code>\n"
+            "Владелец карты: <b>{card_owner}</b>\n"
+            "Сумма оплаты: <b>{amount} сум</b>\n\n"
+            "ℹ️ {instruction}\n\n"
+            "Пожалуйста, отправьте скриншот чека (в виде фото или файла) сюда 👇"
+        ),
+    },
+    "invalid_receipt": {
+        "uz": "❗️Iltimos, to'lov cheki skrinshotini (rasm yoki fayl shaklida) yuboring.",
+        "en": "❗️Please send a valid receipt screenshot (photo or file).",
+        "ru": "❗️Пожалуйста, отправьте скриншот чека (фото или файл).",
+    },
     "confirm_send": {"uz": "Yuborishni tasdiqlaysizmi?", "en": "Do you confirm sending?", "ru": "Подтверждаете отправку?"},
     "post_sent": {
         "uz": "✅ E'loningiz yuborildi va admin tomonidan tekshirilmoqda. Tasdiqlansa, kanalga chiqadi.",
         "en": "✅ Your announcement was sent and is being reviewed by the admin. It will be published once approved.",
         "ru": "✅ Ваше объявление отправлено и проверяется администратором. После одобрения оно будет опубликовано.",
     },
+    "post_sent_premium": {
+        "uz": (
+            "✅ E'loningiz tekshirish uchun adminga yuborildi!\n\n"
+            "Admin e'loningizni ma'qullaganidan so'ng, to'lov uchun rekvizitlar yuboriladi."
+        ),
+        "en": (
+            "✅ Your announcement has been submitted for admin review!\n\n"
+            "Once approved by the admin, payment details will be sent to you."
+        ),
+        "ru": (
+            "✅ Ваше объявление отправлено на проверку администратору!\n\n"
+            "После одобрения администратором вам будут отправлены реквизиты для оплаты."
+        ),
+    },
+    "receipt_received": {
+        "uz": (
+            "✅ To'lov cheki qabul qilindi va adminga yuborildi!\n\n"
+            "Admin to'lovni tasdiqlashi bilan e'loningiz kanalga joylanadi."
+        ),
+        "en": (
+            "✅ Payment receipt received and sent to admin!\n\n"
+            "Your announcement will be published to the channel as soon as payment is confirmed."
+        ),
+        "ru": (
+            "✅ Чек об оплате принят и отправлен администратору!\n\n"
+            "После подтверждения оплаты ваше объявление сразу появится на канале."
+        ),
+    },
+    "ask_receipt_upload": {
+        "uz": "Iltimos, to'lov cheki skrinshotini (rasm yoki fayl ko'rinishida) shu yerga yuboring 👇",
+        "en": "Please send the payment receipt screenshot (photo or file) here 👇",
+        "ru": "Пожалуйста, отправьте скриншот чека (фото или файл) сюда 👇",
+    },
+    "no_waiting_announcement": {
+        "uz": "To'lov kutilayotgan e'lon topilmadi. Avval e'loningiz admin tomonidan ma'qullanishini kuting.",
+        "en": "No announcement awaiting payment found. Please wait until admin approves your announcement.",
+        "ru": "Не найдено объявлений, ожидающих оплаты. Дождитесь подтверждения от администратора.",
+    },
+    "ask_contact_name": {
+        "uz": "✍️ Ism va familiyangizni kiriting:",
+        "en": "✍️ Enter your full name:",
+        "ru": "✍️ Введите ваше имя и фамилию:",
+    },
+    "invalid_contact_name": {
+        "uz": "❗️Ism bo'sh bo'lishi mumkin emas.",
+        "en": "❗️Name cannot be empty.",
+        "ru": "❗️Имя не может быть пустым.",
+    },
+    "ask_contact_message": {
+        "uz": "✉️ Administratorlar uchun xabaringizni yozing:",
+        "en": "✉️ Write your message for the administrators:",
+        "ru": "✉️ Напишите ваше сообщение для администраторов:",
+    },
+    "invalid_contact_message": {
+        "uz": "❗️Xabar matni bo'sh bo'lishi mumkin emas.",
+        "en": "❗️Message cannot be empty.",
+        "ru": "❗️Сообщение не может быть пустым.",
+    },
+    "contact_sent": {
+        "uz": "✅ Xabaringiz administratorlarga yuborildi. Tez orada siz bilan bog'lanamiz!",
+        "en": "✅ Your message has been sent to the administrators. We will contact you soon!",
+        "ru": "✅ Ваше сообщение отправлено администраторам. Мы свяжемся с вами в ближайшее время!",
+    },
+
     "post_cancelled": {
         "uz": "🚫 E'lon joylash bekor qilindi.",
         "en": "🚫 Posting an announcement was cancelled.",

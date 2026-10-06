@@ -11,8 +11,14 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
-from apps.announcements.models import Announcement, AnnouncementStatus
-from apps.announcements.services import approve_announcement, reject_announcement
+from apps.announcements.models import Announcement, AnnouncementStatus, PaymentSetting
+from apps.announcements.services import (
+    approve_announcement,
+    approve_payment,
+    delete_resume,
+    reject_announcement,
+    reject_payment,
+)
 from apps.categories.models import AnnouncementCategory
 from apps.users.models import BotUser
 
@@ -21,6 +27,7 @@ from .serializers import (
     AdminAnnouncementWriteSerializer,
     AdminBotUserSerializer,
     AdminCategorySerializer,
+    AdminPaymentSettingSerializer,
 )
 
 
@@ -82,6 +89,8 @@ class StatsView(StaffOnlyMixin, APIView):
         return Response(
             {
                 "pending": counts.get(AnnouncementStatus.PENDING, 0),
+                "waiting_payment": counts.get(AnnouncementStatus.WAITING_PAYMENT, 0),
+                "payment_pending": counts.get(AnnouncementStatus.PAYMENT_PENDING, 0),
                 "approved": counts.get(AnnouncementStatus.APPROVED, 0),
                 "rejected": counts.get(AnnouncementStatus.REJECTED, 0),
                 "users": BotUser.objects.count(),
@@ -136,9 +145,9 @@ class AnnouncementViewSet(
         return Response(AdminAnnouncementSerializer(instance).data)
 
     def _moderation_response(self, announcement, code):
-        if code == "not_pending":
+        if code in ("not_pending", "invalid_status"):
             return Response(
-                {"detail": "Bu e'lon allaqachon ko'rib chiqilgan.", "status": announcement.status},
+                {"detail": "Bu e'lon holati mos kelmaydi yoki allaqachon ko'rib chiqilgan.", "status": announcement.status},
                 status=status.HTTP_409_CONFLICT,
             )
         if code == "channel_failed":
@@ -163,6 +172,42 @@ class AnnouncementViewSet(
         self.get_object()
         announcement, code = reject_announcement(int(pk), request.data.get("reason", ""))
         return self._moderation_response(announcement, code)
+
+    @action(detail=True, methods=["post"], url_path="approve-payment")
+    def approve_payment_action(self, request, pk=None):
+        self.get_object()
+        announcement, code = approve_payment(int(pk))
+        return self._moderation_response(announcement, code)
+
+    @action(detail=True, methods=["post"], url_path="reject-payment")
+    def reject_payment_action(self, request, pk=None):
+        self.get_object()
+        announcement, code = reject_payment(int(pk), request.data.get("reason", ""))
+        return self._moderation_response(announcement, code)
+
+    @action(detail=True, methods=["post"], url_path="delete-resume")
+    def delete_resume_action(self, request, pk=None):
+        self.get_object()
+        success = delete_resume(int(pk))
+        if success:
+            announcement = Announcement.objects.select_related("category", "user").get(pk=int(pk))
+            return Response(AdminAnnouncementSerializer(announcement).data)
+        return Response({"detail": "Rezyume topilmadi yoki allaqachon o'chirilgan."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# --- To'lov sozlamalari (plastik karta, narx) -----------------------------------
+
+class AdminPaymentSettingView(StaffOnlyMixin, APIView):
+    def get(self, request):
+        setting = PaymentSetting.get_active()
+        return Response(AdminPaymentSettingSerializer(setting).data)
+
+    def patch(self, request):
+        setting = PaymentSetting.get_active()
+        serializer = AdminPaymentSettingSerializer(setting, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 # --- E'lon turlari --------------------------------------------------------------

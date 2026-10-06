@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from .views import (
+    AdminPaymentSettingView,
     AnnouncementViewSet,
     BotUserViewSet,
     CategoryViewSet,
@@ -21,5 +22,6 @@ urlpatterns = [
     path("auth/me/", MeView.as_view(), name="admin-me"),
     path("auth/logout/", LogoutView.as_view(), name="admin-logout"),
     path("stats/", StatsView.as_view(), name="admin-stats"),
+    path("payment-settings/", AdminPaymentSettingView.as_view(), name="admin-payment-settings"),
     path("", include(router.urls)),
 ]
