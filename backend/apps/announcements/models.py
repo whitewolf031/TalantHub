@@ -84,6 +84,12 @@ class Announcement(models.Model):
     resume_deleted_at = models.DateTimeField(
         null=True, blank=True, verbose_name="Rezyume o'chirilgan vaqti"
     )
+    feedback_asked_at = models.DateTimeField(
+        null=True, blank=True, verbose_name="Topdingizmi so'rovi yuborilgan vaqt"
+    )
+    is_completed = models.BooleanField(
+        default=False, verbose_name="Topilgan / Yopilgan"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -139,8 +145,27 @@ class PaymentSetting(models.Model):
 
     @classmethod
     def get_active(cls):
+        from django.conf import settings
+        env_card = getattr(settings, "PAYMENT_CARD_NUMBER", "") or "9860 0000 0000 0000"
+        env_owner = getattr(settings, "PAYMENT_CARD_OWNER", "") or "Talant24 Admin"
+        env_amount = getattr(settings, "PAYMENT_AMOUNT", 10000)
+
         setting = cls.objects.filter(is_active=True).first()
         if not setting:
-            setting = cls.objects.create()
+            setting = cls.objects.create(
+                card_number=env_card,
+                card_owner=env_owner,
+                amount=env_amount,
+            )
+        else:
+            updated = False
+            if env_card and setting.card_number != env_card:
+                setting.card_number = env_card
+                updated = True
+            if env_owner and setting.card_owner != env_owner:
+                setting.card_owner = env_owner
+                updated = True
+            if updated:
+                setting.save(update_fields=["card_number", "card_owner", "updated_at"])
         return setting
 

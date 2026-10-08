@@ -74,7 +74,8 @@ class AdminAnnouncementSerializer(serializers.ModelSerializer):
             "contact_time_start", "contact_time_end", "contact_time_display",
             "purpose", "is_premium", "linkedin_url", "portfolio_url",
             "resume_file_url", "payment_receipt_url", "post_count",
-            "next_publish_date", "resume_deleted_at", "status", "reject_reason",
+            "next_publish_date", "resume_deleted_at", "feedback_asked_at", "is_completed",
+            "status", "reject_reason",
             "channel_message_id", "created_at", "approved_at", "rejected_at",
         ]
 

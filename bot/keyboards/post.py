@@ -69,3 +69,23 @@ def portfolio_keyboard(lang: str) -> InlineKeyboardMarkup:
     )
 
 
+def premium_found_action_keyboard(announcement_id: int, lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("btn_prem_delete", lang),
+                    callback_data=f"prem_action:delete:{announcement_id}",
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("btn_prem_continue", lang),
+                    callback_data=f"prem_action:continue:{announcement_id}",
+                )
+            ],
+        ]
+    )
+
+
+

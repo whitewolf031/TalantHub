@@ -18,6 +18,8 @@ from .serializers import (
 from .services import (
     approve_announcement,
     approve_payment,
+    handle_premium_after_found,
+    mark_announcement_found,
     process_scheduled_posts_and_cleanup,
     reject_announcement,
     reject_payment,
@@ -25,9 +27,11 @@ from .services import (
 )
 
 
-def _cooldown_remaining(user):
+def _cooldown_remaining(user, is_premium=False):
     """Foydalanuvchi qayta e'lon joylashi uchun qolgan vaqt (timedelta) yoki None."""
-    last_approved = user.last_approved_announcement()
+    if is_premium:
+        return None
+    last_approved = user.last_approved_announcement(is_premium=False)
     if not last_approved or not last_approved.approved_at:
         return None
     cooldown = timedelta(hours=settings.ANNOUNCEMENT_COOLDOWN_HOURS)
@@ -45,12 +49,13 @@ class AnnouncementCreateView(APIView):
 
     def post(self, request):
         user = BotUser.objects.filter(telegram_id=request.data.get("telegram_id")).first()
+        is_premium = request.data.get("is_premium") in (True, "true", "True", 1, "1")
 
         if user:
             if user.is_blocked:
                 return Response({"detail": "blocked"}, status=status.HTTP_403_FORBIDDEN)
 
-            remaining = _cooldown_remaining(user)
+            remaining = _cooldown_remaining(user, is_premium=is_premium)
             if remaining:
                 return Response(
                     {"detail": "cooldown", "remaining_seconds": int(remaining.total_seconds())},
@@ -94,13 +99,53 @@ class LastAnnouncementStatusView(APIView):
         if user.is_blocked:
             return Response({"can_post": False, "remaining_seconds": 0, "blocked": True})
 
-        remaining = _cooldown_remaining(user)
+        is_premium = request.query_params.get("is_premium") in ("true", "True", "1", 1)
+        remaining = _cooldown_remaining(user, is_premium=is_premium)
         if not remaining:
             return Response({"can_post": True, "remaining_seconds": 0, "blocked": False})
 
         return Response(
             {"can_post": False, "remaining_seconds": int(remaining.total_seconds()), "blocked": False}
         )
+
+
+class MarkFoundView(APIView):
+    """
+    POST /api/announcements/<id>/mark-found/
+    Foydalanuvchi "Ish topdim / Xodim topdim" deganda chaqiriladi.
+    Free: kanaldagi e'lonni "TOPILDI" deb tahrirlaydi, is_completed=True qiladi.
+    Premium: kanaldagi e'lonni tahrirlaydi, botga premium dialog davomi kerakligini qaytaradi.
+    """
+
+    def post(self, request, pk):
+        announcement = get_object_or_404(Announcement, pk=pk)
+        announcement, result = mark_announcement_found(pk)
+        return Response({
+            "status": result,
+            "is_premium": announcement.is_premium if announcement else False,
+            "announcement": AnnouncementReadSerializer(announcement).data if announcement else None,
+        })
+
+
+class PremiumFoundActionView(APIView):
+    """
+    POST /api/announcements/<id>/premium-found-action/
+    body: {"action": "continue" | "delete"}
+    """
+
+    def post(self, request, pk):
+        announcement = get_object_or_404(Announcement, pk=pk)
+        action = request.data.get("action")
+        if action not in ("continue", "delete"):
+            return Response(
+                {"detail": "action must be 'continue' or 'delete'"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        announcement, result = handle_premium_after_found(pk, action)
+        return Response({
+            "status": result,
+            "announcement": AnnouncementReadSerializer(announcement).data if announcement else None,
+        })
 
 
 class UserAnnouncementListView(APIView):

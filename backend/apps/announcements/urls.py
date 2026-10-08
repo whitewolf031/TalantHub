@@ -4,8 +4,10 @@ from .views import (
     AnnouncementCreateView,
     AnnouncementModerateView,
     LastAnnouncementStatusView,
+    MarkFoundView,
     PaymentModerateView,
     PaymentSettingView,
+    PremiumFoundActionView,
     RunSchedulerView,
     SubmitReceiptView,
     UserAnnouncementListView,
@@ -57,5 +59,15 @@ urlpatterns = [
         "<int:pk>/reject-payment/",
         PaymentModerateView.as_view(moderation="reject"),
         name="announcement-reject-payment",
+    ),
+    path(
+        "<int:pk>/mark-found/",
+        MarkFoundView.as_view(),
+        name="announcement-mark-found",
+    ),
+    path(
+        "<int:pk>/premium-found-action/",
+        PremiumFoundActionView.as_view(),
+        name="announcement-premium-found-action",
     ),
 ]

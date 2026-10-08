@@ -140,6 +140,8 @@ class AnnouncementReadSerializer(serializers.ModelSerializer):
             "post_count",
             "next_publish_date",
             "resume_deleted_at",
+            "feedback_asked_at",
+            "is_completed",
             "status",
             "preview_text",
             "created_at",

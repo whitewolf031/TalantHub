@@ -60,6 +60,42 @@ CATEGORY_ACTION_PHRASES = {
     "student_needed": "SHOGIRD QIDIRMOQDA",
 }
 
+CATEGORY_FOUND_PHRASES = {
+    "job_seeker": "✅ ISH TOPILDI!",
+    "mentor_needed": "✅ USTOZ TOPILDI!",
+    "employee_needed": "✅ XODIM TOPILDI!",
+    "partner_needed": "✅ SHERIK / HAMKOR TOPILDI!",
+    "student_needed": "✅ SHOGIRD TOPILDI!",
+}
+
+FOUND_QUESTIONS = {
+    "job_seeker": {
+        "uz": "Ish topdingizmi?",
+        "en": "Did you find a job?",
+        "ru": "Вы нашли работу?",
+    },
+    "employee_needed": {
+        "uz": "Xodim topdingizmi?",
+        "en": "Did you find an employee?",
+        "ru": "Вы нашли сотрудника?",
+    },
+    "mentor_needed": {
+        "uz": "Ustoz topdingizmi?",
+        "en": "Did you find a mentor?",
+        "ru": "Вы нашли наставника?",
+    },
+    "student_needed": {
+        "uz": "Shogird topdingizmi?",
+        "en": "Did you find a student?",
+        "ru": "Вы нашли ученика?",
+    },
+    "partner_needed": {
+        "uz": "Sherik topdingizmi?",
+        "en": "Did you find a partner?",
+        "ru": "Вы нашли партнёра?",
+    },
+}
+
 from datetime import timedelta
 
 def build_channel_text(announcement) -> str:
@@ -348,19 +384,135 @@ def delete_resume(pk: int) -> bool:
     return False
 
 
+def send_found_inquiry(announcement) -> bool:
+    """7 kun o'tgan e'lon egasiga 'Topdingizmi?' so'rovini yuboradi."""
+    lang = announcement.user.language if announcement.user.language in ("uz", "en", "ru") else "uz"
+    cat_key = announcement.category.key
+    q_dict = FOUND_QUESTIONS.get(cat_key, {"uz": "Natija bo'ldimi?", "en": "Did you find it?", "ru": "Нашли?"})
+    question = q_dict.get(lang, q_dict["uz"])
+
+    intro_dict = {
+        "uz": f"👋 Assalomu alaykum! Sizning #{announcement.id} sonli e'loningiz kanalga chiqqaniga 1 hafta bo'ldi.\n\n❓ <b>{question}</b>",
+        "en": f"👋 Hello! It has been 1 week since your announcement #{announcement.id} was posted to the channel.\n\n❓ <b>{question}</b>",
+        "ru": f"👋 Здравствуйте! Прошла 1 неделя с момента публикации вашего объявления #{announcement.id} на канале.\n\n❓ <b>{question}</b>",
+    }
+    text = intro_dict.get(lang, intro_dict["uz"])
+
+    yes_btn = {"uz": "✅ Ha", "en": "✅ Yes", "ru": "✅ Да"}.get(lang, "✅ Ha")
+    no_btn = {"uz": "❌ Yo'q", "en": "❌ No", "ru": "❌ Нет"}.get(lang, "❌ Yo'q")
+
+    keyboard = {
+        "inline_keyboard": [
+            [
+                {"text": yes_btn, "callback_data": f"found:yes:{announcement.id}"},
+                {"text": no_btn, "callback_data": f"found:no:{announcement.id}"},
+            ]
+        ]
+    }
+    res = _telegram_call(
+        "sendMessage",
+        {
+            "chat_id": announcement.user.telegram_id,
+            "text": text,
+            "reply_markup": keyboard,
+            "parse_mode": "HTML",
+        },
+    )
+    return bool(res)
+
+
+def mark_channel_message_as_found(announcement) -> bool:
+    """Kanaldagi e'lonni 'TOPILDI' deb tahrirlaydi."""
+    channel_id = settings.TELEGRAM_CHANNEL_ID
+    msg_id = announcement.channel_message_id
+    if not channel_id or not msg_id:
+        return False
+
+    found_title = CATEGORY_FOUND_PHRASES.get(announcement.category.key, "✅ TOPILDI!")
+    original_text = build_channel_text(announcement)
+    updated_text = (
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"{found_title}\n"
+        f"(E'LON O'Z KUCHINI YO'QOTDI)\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"{original_text}"
+    )
+
+    res = None
+    if announcement.is_premium and announcement.resume_file:
+        res = _telegram_call(
+            "editMessageCaption",
+            {
+                "chat_id": channel_id,
+                "message_id": msg_id,
+                "caption": updated_text[:1024],
+            },
+        )
+    if not res:
+        res = _telegram_call(
+            "editMessageText",
+            {
+                "chat_id": channel_id,
+                "message_id": msg_id,
+                "text": updated_text,
+            },
+        )
+    return bool(res)
+
+
+def mark_announcement_found(pk: int) -> tuple[Announcement | None, str]:
+    """Foydalanuvchi 'Ha (topdim)' deganda e'lonni topilgan deb belgilaydi va kanalni yangilaydi."""
+    try:
+        announcement = Announcement.objects.select_related("category", "user").get(pk=pk)
+    except Announcement.DoesNotExist:
+        return None, "not_found"
+
+    announcement.is_completed = True
+    announcement.save(update_fields=["is_completed", "updated_at"])
+
+    mark_channel_message_as_found(announcement)
+    return announcement, "ok"
+
+
+def handle_premium_after_found(pk: int, action: str) -> tuple[Announcement | None, str]:
+    """
+    Premium e'lon egasi 'Topdim' degandan keyin:
+    action: 'continue' (chiqarishda davom etish) yoki 'delete' (o'chirib tashlash).
+    """
+    try:
+        announcement = Announcement.objects.select_related("category", "user").get(pk=pk)
+    except Announcement.DoesNotExist:
+        return None, "not_found"
+
+    if action == "continue":
+        announcement.is_completed = False
+        announcement.save(update_fields=["is_completed", "updated_at"])
+        return announcement, "continued"
+    elif action == "delete":
+        announcement.is_completed = True
+        announcement.next_publish_date = None
+        announcement.save(update_fields=["is_completed", "next_publish_date", "updated_at"])
+        delete_resume(pk)
+        return announcement, "deleted"
+    return announcement, "invalid_action"
+
+
 def process_scheduled_posts_and_cleanup() -> dict:
     """
     1. Har 7 kunda avtomatik chiqarish (1 oyda 4 marta).
     2. 1 oy (30 kun) o'tgandan keyin avtomat rezyumeni o'chirish.
+    3. 7 kun o'tgan e'lonlarga 'Topdingizmi?' so'rovi yuborish.
     """
     now = timezone.now()
     published_count = 0
     cleanup_count = 0
+    inquiries_count = 0
 
-    # 1. Chiqarilishi kerak bo'lgan premium e'lonlar
+    # 1. Chiqarilishi kerak bo'lgan premium e'lonlar (completed bo'lmaganlar)
     due_announcements = Announcement.objects.filter(
         is_premium=True,
         status=AnnouncementStatus.APPROVED,
+        is_completed=False,
         post_count__lt=4,
         next_publish_date__isnull=False,
         next_publish_date__lte=now,
@@ -374,8 +526,9 @@ def process_scheduled_posts_and_cleanup() -> dict:
                 a.next_publish_date = now + timedelta(days=7)
             else:
                 a.next_publish_date = None
+                a.is_completed = True
             a.channel_message_id = msg_id
-            a.save(update_fields=["post_count", "next_publish_date", "channel_message_id", "updated_at"])
+            a.save(update_fields=["post_count", "next_publish_date", "is_completed", "channel_message_id", "updated_at"])
             published_count += 1
 
     # 2. 1 oy (30 kun) o'tgan e'lonlarning rezyumesini avtomatik o'chirish
@@ -394,5 +547,26 @@ def process_scheduled_posts_and_cleanup() -> dict:
             a.save(update_fields=["resume_file", "resume_deleted_at", "updated_at"])
             cleanup_count += 1
 
-    return {"published": published_count, "resumes_cleaned": cleanup_count}
+    # 3. 7 kun o'tgan e'lonlarga 'Topdingizmi?' so'rovi yuborish
+    one_week_ago = now - timedelta(days=7)
+    due_inquiries = Announcement.objects.filter(
+        status=AnnouncementStatus.APPROVED,
+        is_completed=False,
+        feedback_asked_at__isnull=True,
+        approved_at__lte=one_week_ago,
+    ).select_related("category", "user")
+
+    for a in due_inquiries:
+        sent = send_found_inquiry(a)
+        a.feedback_asked_at = now
+        a.save(update_fields=["feedback_asked_at", "updated_at"])
+        if sent:
+            inquiries_count += 1
+
+    return {
+        "published": published_count,
+        "resumes_cleaned": cleanup_count,
+        "inquiries_sent": inquiries_count,
+    }
+
 
