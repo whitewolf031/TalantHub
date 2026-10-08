@@ -19,7 +19,7 @@ async def scheduler_task():
     while True:
         try:
             res = await api_client.run_scheduler()
-            if res.get("published") or res.get("resumes_cleaned"):
+            if res.get("published") or res.get("resumes_cleaned") or res.get("inquiries_sent"):
                 logging.info(f"Scheduler natijasi: {res}")
         except Exception:
             logging.exception("Scheduler bajarilishida xatolik")

@@ -61,9 +61,10 @@ async def get_categories() -> list[dict]:
         return response.json()
 
 
-async def check_cooldown(telegram_id: int) -> dict:
+async def check_cooldown(telegram_id: int, is_premium: bool = False) -> dict:
     async with await _client() as client:
-        response = await client.get(f"/announcements/cooldown/{telegram_id}/")
+        params = {"is_premium": "true"} if is_premium else {}
+        response = await client.get(f"/announcements/cooldown/{telegram_id}/", params=params)
         response.raise_for_status()
         return response.json()
 
@@ -167,4 +168,30 @@ async def run_scheduler() -> dict:
             return response.json() if response.status_code == 200 else {}
         except Exception:
             return {}
+
+
+async def mark_announcement_found(announcement_id: int) -> tuple[bool, dict]:
+    """Foydalanuvchi 'Topdim' deganda e'lonni topilgan deb belgilaydi."""
+    async with await _client() as client:
+        response = await client.post(f"/announcements/{announcement_id}/mark-found/")
+        try:
+            body = response.json()
+        except Exception:
+            body = {}
+        return response.status_code == 200, body
+
+
+async def premium_found_action(announcement_id: int, action: str) -> tuple[bool, dict]:
+    """Premium e'lon uchun 'continue' yoki 'delete' amalini bajaradi."""
+    async with await _client() as client:
+        response = await client.post(
+            f"/announcements/{announcement_id}/premium-found-action/",
+            json={"action": action},
+        )
+        try:
+            body = response.json()
+        except Exception:
+            body = {}
+        return response.status_code == 200, body
+
 

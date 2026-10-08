@@ -130,5 +130,11 @@ TELEGRAM_BOT_TOKEN = env("BOT_TOKEN", default="")
 TELEGRAM_CHANNEL_ID = env("CHANNEL_ID", default="")  # masalan: @talanthub_channel yoki -100...
 
 # Bitta foydalanuvchi tasdiqlangan e'londan keyin necha soatdan so'ng
-# yangi e'lon joylay olishi mumkinligi.
-ANNOUNCEMENT_COOLDOWN_HOURS = env.int("ANNOUNCEMENT_COOLDOWN_HOURS", default=24)
+# yangi e'lon joylay olishi mumkinligi (tekin e'lonlar uchun).
+ANNOUNCEMENT_COOLDOWN_HOURS = env.int("ANNOUNCEMENT_COOLDOWN_HOURS", default=48)
+
+# To'lov sozlamalari (.env dan olinadi)
+PAYMENT_CARD_NUMBER = env("PAYMENT_CARD_NUMBER", default="9860 0000 0000 0000")
+PAYMENT_CARD_OWNER = env("PAYMENT_CARD_OWNER", default="Talant24 Admin")
+PAYMENT_AMOUNT = env.int("PAYMENT_AMOUNT", default=10000)
+

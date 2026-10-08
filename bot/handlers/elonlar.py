@@ -10,6 +10,7 @@ from keyboards.post import (
     currency_keyboard,
     plan_selection_keyboard,
     portfolio_keyboard,
+    premium_found_action_keyboard,
 )
 from services import api_client
 from services.notifier import notify_admins, notify_payment_receipt
@@ -44,12 +45,6 @@ async def start_new_post(message: Message, state: FSMContext):
     cooldown = await api_client.check_cooldown(message.from_user.id)
     if cooldown.get("blocked"):
         await message.answer(t("user_blocked", lang))
-        return
-    if not cooldown.get("can_post", True):
-        remaining = cooldown.get("remaining_seconds", 0)
-        hours, remainder = divmod(remaining, 3600)
-        minutes, _ = divmod(remainder, 60)
-        await message.answer(t("cooldown_wait", lang, hours=hours, minutes=minutes))
         return
 
     categories = await api_client.get_categories()
@@ -104,6 +99,18 @@ async def category_chosen(callback: CallbackQuery, state: FSMContext):
 async def choose_free_plan(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     lang = data.get("lang", "uz")
+
+    cooldown = await api_client.check_cooldown(callback.from_user.id, is_premium=False)
+    if not cooldown.get("can_post", True):
+        remaining = cooldown.get("remaining_seconds", 0)
+        hours, remainder = divmod(remaining, 3600)
+        minutes, _ = divmod(remainder, 60)
+        await callback.message.answer(
+            t("cooldown_free_plan", lang, hours=hours, minutes=minutes),
+            parse_mode="HTML",
+        )
+        await callback.answer()
+        return
 
     await state.update_data(is_premium=False)
     await state.set_state(PostAnnouncement.entering_name)
@@ -699,5 +706,97 @@ def _build_preview(data: dict) -> str:
             lines.append("📄 Rezyume: biriktirilgan")
 
     return "\n".join(lines)
+
+
+# --- 7 kundan keyingi "Topdingizmi?" so'rovi handlerlari -----------------
+
+@router.callback_query(F.data.startswith("found:no:"))
+async def handle_found_no(callback: CallbackQuery):
+    lang = await _get_lang(callback.from_user.id)
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+    await callback.message.answer(t("found_no_response", lang))
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("found:yes:"))
+async def handle_found_yes(callback: CallbackQuery):
+    lang = await _get_lang(callback.from_user.id)
+    raw_id = callback.data.split(":")[2]
+    try:
+        announcement_id = int(raw_id)
+    except ValueError:
+        await callback.answer()
+        return
+
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+
+    success, res = await api_client.mark_announcement_found(announcement_id)
+    if not success:
+        await callback.message.answer(t("generic_error", lang))
+        await callback.answer()
+        return
+
+    is_premium = res.get("is_premium", False)
+    if is_premium:
+        await callback.message.answer(
+            t("found_premium_ask_action", lang),
+            reply_markup=premium_found_action_keyboard(announcement_id, lang),
+        )
+    else:
+        await callback.message.answer(t("found_free_success", lang))
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("prem_action:continue:"))
+async def handle_prem_continue(callback: CallbackQuery):
+    lang = await _get_lang(callback.from_user.id)
+    raw_id = callback.data.split(":")[2]
+    try:
+        announcement_id = int(raw_id)
+    except ValueError:
+        await callback.answer()
+        return
+
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+
+    success, _ = await api_client.premium_found_action(announcement_id, "continue")
+    if success:
+        await callback.message.answer(t("prem_continue_success", lang))
+    else:
+        await callback.message.answer(t("generic_error", lang))
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("prem_action:delete:"))
+async def handle_prem_delete(callback: CallbackQuery):
+    lang = await _get_lang(callback.from_user.id)
+    raw_id = callback.data.split(":")[2]
+    try:
+        announcement_id = int(raw_id)
+    except ValueError:
+        await callback.answer()
+        return
+
+    try:
+        await callback.message.edit_reply_markup(reply_markup=None)
+    except Exception:
+        pass
+
+    success, _ = await api_client.premium_found_action(announcement_id, "delete")
+    if success:
+        await callback.message.answer(t("prem_deleted_success", lang))
+    else:
+        await callback.message.answer(t("generic_error", lang))
+    await callback.answer()
+
 
 

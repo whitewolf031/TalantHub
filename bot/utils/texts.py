@@ -318,6 +318,67 @@ TEXTS = {
     "status_pending": {"uz": "🕓 Kutilmoqda", "en": "🕓 Pending", "ru": "🕓 На рассмотрении"},
     "status_approved": {"uz": "✅ Tasdiqlangan", "en": "✅ Approved", "ru": "✅ Одобрено"},
     "status_rejected": {"uz": "❌ Rad etilgan", "en": "❌ Rejected", "ru": "❌ Отклонено"},
+    "cooldown_free_plan": {
+        "uz": (
+            "⏳ Tekin tarifda qayta e'lon joylash uchun 48 soat kutilishi kerak.\n"
+            "Qolgan vaqt: {hours} soat {minutes} daqiqa.\n\n"
+            "💎 Kutmasdan yangi e'lon berish uchun <b>Premium</b> tarifidan foydalanishingiz mumkin!"
+        ),
+        "en": (
+            "⏳ You need to wait 48 hours to post again on the Free plan.\n"
+            "Remaining time: {hours}h {minutes}m.\n\n"
+            "💎 You can post immediately without waiting using the <b>Premium</b> plan!"
+        ),
+        "ru": (
+            "⏳ Для бесплатного тарифа необходимо подождать 48 часов перед повторной публикацией.\n"
+            "Осталось времени: {hours}ч {minutes}м.\n\n"
+            "💎 Чтобы опубликовать без ожидания, вы можете воспользоваться <b>Премиум</b> тарифом!"
+        ),
+    },
+    "found_no_response": {
+        "uz": "👌 Tushunarli! E'loningiz o'z kuchida qoladi. Tez orada natija bo'lishiga tilakdoshmiz! 🤝",
+        "en": "👌 Understood! Your announcement remains active. Wishing you good results soon! 🤝",
+        "ru": "👌 Понятно! Ваше объявление остается активным. Желаем скорейших результатов! 🤝",
+    },
+    "found_free_success": {
+        "uz": "🎉 Ajoyib! E'loningiz kanalda 'TOPILDI' deb belgilandi va o'z kuchini yo'qotdi.",
+        "en": "🎉 Great! Your announcement in the channel has been marked as 'FOUND' and closed.",
+        "ru": "🎉 Отлично! Ваше объявление в канале помечено как 'НАЙДЕНО' и закрыто.",
+    },
+    "found_premium_ask_action": {
+        "uz": (
+            "🎉 Ajoyib! Kanaldagi e'loningiz 'TOPILDI' deb belgilandi.\n\n"
+            "E'lonni o'chirib tashlaysizmi yoki rezyumengizni qayta chiqarishda davom etaveraylikmi?"
+        ),
+        "en": (
+            "🎉 Great! Your announcement in the channel has been marked as 'FOUND'.\n\n"
+            "Would you like to delete the announcement or continue posting your resume?"
+        ),
+        "ru": (
+            "🎉 Отлично! Ваше объявление в канале помечено как 'НАЙДЕНО'.\n\n"
+            "Удалить объявление или продолжать публикацию резюме?"
+        ),
+    },
+    "btn_prem_delete": {
+        "uz": "🗑 E'lonni o'chirish",
+        "en": "🗑 Delete announcement",
+        "ru": "🗑 Удалить объявление",
+    },
+    "btn_prem_continue": {
+        "uz": "▶️ Chiqarishda davom etish",
+        "en": "▶️ Continue posting",
+        "ru": "▶️ Продолжать публикацию",
+    },
+    "prem_deleted_success": {
+        "uz": "✅ E'loningiz to'xtatildi va rezyume bazadan o'chirildi. Rahmat!",
+        "en": "✅ Your announcement has been stopped and resume deleted from the database. Thank you!",
+        "ru": "✅ Ваше объявление остановлено, а резюме удалено из базы. Спасибо!",
+    },
+    "prem_continue_success": {
+        "uz": "✅ E'loningiz reja bo'yicha (haftada 1 marta) muddati tugaguncha chiqarilishda davom etaveradi.",
+        "en": "✅ Your announcement will continue to be posted weekly according to schedule until expiration.",
+        "ru": "✅ Ваше объявление продолжит публиковаться еженедельно по графику до окончания срока.",
+    },
 }
 
 

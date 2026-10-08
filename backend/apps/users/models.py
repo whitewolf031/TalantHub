@@ -31,9 +31,8 @@ class BotUser(models.Model):
     def __str__(self):
         return f"{self.first_name or 'NoName'} (@{self.username or '—'}) [{self.telegram_id}]"
 
-    def last_approved_announcement(self):
-        return (
-            self.announcements.filter(status="approved")
-            .order_by("-approved_at")
-            .first()
-        )
+    def last_approved_announcement(self, is_premium=None):
+        qs = self.announcements.filter(status="approved")
+        if is_premium is not None:
+            qs = qs.filter(is_premium=is_premium)
+        return qs.order_by("-approved_at").first()
