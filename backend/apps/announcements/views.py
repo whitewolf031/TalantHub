@@ -65,6 +65,14 @@ class AnnouncementCreateView(APIView):
         serializer = AnnouncementCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         announcement = serializer.save()
+
+        # Agar premium bo'lsa va foydalanuvchida bepul premium vaucher bo'lsa
+        if is_premium and user and user.free_premium_posts > 0:
+            user.free_premium_posts -= 1
+            user.save(update_fields=["free_premium_posts"])
+            announcement.is_free_premium_reward = True
+            announcement.save(update_fields=["is_free_premium_reward"])
+
         return Response(
             AnnouncementReadSerializer(announcement).data,
             status=status.HTTP_201_CREATED,

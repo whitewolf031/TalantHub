@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 
 from config import BOT_TOKEN
-from handlers import admin, contact, elonlar, help, profile, settings, start
+from handlers import admin, contact, elonlar, help, profile, referral, settings, start
 from services import api_client
 
 logging.basicConfig(level=logging.INFO)
@@ -36,6 +36,7 @@ async def main():
     dp.include_router(contact.router)
     dp.include_router(elonlar.router)
     dp.include_router(start.router)
+    dp.include_router(referral.router)
     dp.include_router(profile.router)
     dp.include_router(settings.router)
     dp.include_router(help.router)

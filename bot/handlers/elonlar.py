@@ -13,6 +13,7 @@ from keyboards.post import (
     premium_found_action_keyboard,
 )
 from services import api_client
+from services.channel import get_channel_link, is_subscribed, subscription_keyboard
 from services.notifier import notify_admins, notify_payment_receipt
 from states.post_states import PostAnnouncement
 from utils.texts import TEXTS, t
@@ -41,6 +42,17 @@ def _is_new_post_button(message: Message) -> bool:
 @router.message(_is_new_post_button)
 async def start_new_post(message: Message, state: FSMContext):
     lang = await _get_lang(message.from_user.id)
+
+    # 1. Kanal obunasini tekshirish
+    subscribed = await is_subscribed(message.bot, message.from_user.id)
+    if not subscribed:
+        channel_url = await get_channel_link(message.bot)
+        await message.answer(
+            t("must_subscribe_channel", lang),
+            reply_markup=subscription_keyboard(lang, channel_url),
+            parse_mode="HTML",
+        )
+        return
 
     cooldown = await api_client.check_cooldown(message.from_user.id)
     if cooldown.get("blocked"):
@@ -83,13 +95,20 @@ async def category_chosen(callback: CallbackQuery, state: FSMContext):
         payment_info = {"amount": 10000, "card_number": "", "card_owner": ""}
 
     amount = payment_info.get("amount", 10000)
-    await state.update_data(category_key=category_key, payment_info=payment_info)
+    user_info = await api_client.get_user(callback.from_user.id)
+    has_free_premium = (user_info.get("free_premium_posts", 0) > 0) if user_info else False
+
+    await state.update_data(
+        category_key=category_key,
+        payment_info=payment_info,
+        has_free_premium=has_free_premium,
+    )
     await state.set_state(PostAnnouncement.choosing_plan)
 
     amount_str = f"{amount:,}".replace(",", " ")
     await callback.message.edit_text(
         t("choose_plan", lang, amount=amount_str),
-        reply_markup=plan_selection_keyboard(lang, amount),
+        reply_markup=plan_selection_keyboard(lang, amount, has_free_premium=has_free_premium),
         parse_mode="HTML",
     )
     await callback.answer()
@@ -125,6 +144,10 @@ async def choose_premium_plan(callback: CallbackQuery, state: FSMContext):
 
     await state.update_data(is_premium=True)
     await state.set_state(PostAnnouncement.entering_name)
+
+    if data.get("has_free_premium"):
+        await callback.message.answer(t("using_free_premium_reward", lang), parse_mode="HTML")
+
     await callback.message.edit_text(t("ask_name", lang))
     await callback.answer()
 

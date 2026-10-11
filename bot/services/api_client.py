@@ -15,16 +15,26 @@ async def _client() -> httpx.AsyncClient:
     return httpx.AsyncClient(base_url=BACKEND_API_URL, headers=HEADERS, timeout=10)
 
 
-async def register_user(telegram_id: int, username: str | None, first_name: str | None, language: str) -> dict:
+async def register_user(
+    telegram_id: int,
+    username: str | None,
+    first_name: str | None,
+    language: str = "uz",
+    ref_code: str | None = None,
+) -> dict:
     async with await _client() as client:
+        payload = {
+            "telegram_id": telegram_id,
+            "username": username,
+            "first_name": first_name,
+            "language": language,
+        }
+        if ref_code:
+            payload["ref_code"] = ref_code
+
         response = await client.post(
             "/users/register/",
-            json={
-                "telegram_id": telegram_id,
-                "username": username,
-                "first_name": first_name,
-                "language": language,
-            },
+            json=payload,
         )
         response.raise_for_status()
         return response.json()
@@ -193,5 +203,25 @@ async def premium_found_action(announcement_id: int, action: str) -> tuple[bool,
         except Exception:
             body = {}
         return response.status_code == 200, body
+
+
+async def get_referral_status(telegram_id: int) -> dict:
+    """Foydalanuvchining taklif kampaniyasi holatini oladi."""
+    async with await _client() as client:
+        response = await client.get(f"/users/{telegram_id}/referral/")
+        response.raise_for_status()
+        return response.json()
+
+
+async def create_referral_campaign(telegram_id: int) -> tuple[bool, dict]:
+    """Yangi 7 kunlik taklif kampaniyasi ochadi."""
+    async with await _client() as client:
+        response = await client.post(f"/users/{telegram_id}/referral/create/")
+        try:
+            body = response.json()
+        except Exception:
+            body = {}
+        return response.status_code == 201, body
+
 
 
