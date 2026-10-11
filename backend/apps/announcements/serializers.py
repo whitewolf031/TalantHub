@@ -142,6 +142,7 @@ class AnnouncementReadSerializer(serializers.ModelSerializer):
             "resume_deleted_at",
             "feedback_asked_at",
             "is_completed",
+            "is_free_premium_reward",
             "status",
             "preview_text",
             "created_at",

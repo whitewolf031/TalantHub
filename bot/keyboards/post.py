@@ -28,8 +28,13 @@ def currency_keyboard(lang: str) -> InlineKeyboardMarkup:
     )
 
 
-def plan_selection_keyboard(lang: str, amount: int = 10000) -> InlineKeyboardMarkup:
+def plan_selection_keyboard(lang: str, amount: int = 10000, has_free_premium: bool = False) -> InlineKeyboardMarkup:
     formatted_amount = f"{amount:,}".replace(",", " ")
+    prem_text = (
+        t("btn_plan_premium_free", lang)
+        if has_free_premium
+        else t("btn_plan_premium", lang, amount=formatted_amount)
+    )
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -39,7 +44,7 @@ def plan_selection_keyboard(lang: str, amount: int = 10000) -> InlineKeyboardMar
             ],
             [
                 InlineKeyboardButton(
-                    text=t("btn_plan_premium", lang, amount=formatted_amount),
+                    text=prem_text,
                     callback_data="plan:premium",
                 )
             ],

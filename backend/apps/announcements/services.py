@@ -245,7 +245,7 @@ def approve_announcement(pk: int):
         if announcement.status != AnnouncementStatus.PENDING:
             return announcement, "not_pending"
 
-        if announcement.is_premium:
+        if announcement.is_premium and not announcement.is_free_premium_reward:
             announcement.status = AnnouncementStatus.WAITING_PAYMENT
             announcement.save(update_fields=["status", "updated_at"])
             notify_user_to_pay(announcement)
@@ -259,7 +259,9 @@ def approve_announcement(pk: int):
         announcement.approved_at = timezone.now()
         announcement.channel_message_id = message_id
         announcement.post_count = 1
-        announcement.next_publish_date = None
+        announcement.next_publish_date = (
+            timezone.now() + timedelta(days=7) if announcement.is_premium else None
+        )
 
         announcement.save(
             update_fields=[
@@ -563,10 +565,16 @@ def process_scheduled_posts_and_cleanup() -> dict:
         if sent:
             inquiries_count += 1
 
+    # 4. 7 kun o'tgan taklif (referral) kampaniyalarini avtomatik yopish
+    from apps.users.models import ReferralCampaign
+    expired_referrals = ReferralCampaign.objects.filter(is_active=True, expires_at__lte=now)
+    expired_ref_count = expired_referrals.update(is_active=False)
+
     return {
         "published": published_count,
         "resumes_cleaned": cleanup_count,
         "inquiries_sent": inquiries_count,
+        "referrals_expired": expired_ref_count,
     }
 
 

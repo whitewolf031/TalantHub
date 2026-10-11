@@ -90,6 +90,9 @@ class Announcement(models.Model):
     is_completed = models.BooleanField(
         default=False, verbose_name="Topilgan / Yopilgan"
     )
+    is_free_premium_reward = models.BooleanField(
+        default=False, verbose_name="Bepul taqdim etilgan Premium e'lon"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

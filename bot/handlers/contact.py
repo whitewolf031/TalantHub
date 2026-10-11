@@ -5,6 +5,7 @@ from aiogram.types import Message
 
 from keyboards.main import back_keyboard, main_menu_keyboard
 from services import api_client
+from services.channel import get_channel_link, is_subscribed, subscription_keyboard
 from services.notifier import notify_contact_message
 from states.post_states import ContactAdmin
 from utils.texts import TEXTS, t
@@ -39,6 +40,17 @@ def _is_back_button(message: Message) -> bool:
 @router.message(_is_contact_admin_button)
 async def start_contact_admin(message: Message, state: FSMContext):
     lang = await _get_lang(message.from_user.id)
+
+    subscribed = await is_subscribed(message.bot, message.from_user.id)
+    if not subscribed:
+        channel_url = await get_channel_link(message.bot)
+        await message.answer(
+            t("must_subscribe_channel", lang),
+            reply_markup=subscription_keyboard(lang, channel_url),
+            parse_mode="HTML",
+        )
+        return
+
     await state.clear()
     await state.update_data(lang=lang)
     await state.set_state(ContactAdmin.entering_name)

@@ -25,6 +25,11 @@ TEXTS = {
         "ru": "Выберите один из разделов ниже 👇",
     },
     "btn_new_post": {"uz": "📢 E'lon joylash", "en": "📢 Post an ad", "ru": "📢 Разместить объявление"},
+    "btn_referral": {
+        "uz": "👥 Do'stlarni taklif qilish",
+        "en": "👥 Invite Friends",
+        "ru": "👥 Пригласить друзей",
+    },
     "btn_profile": {"uz": "👤 Profil", "en": "👤 Profile", "ru": "👤 Профиль"},
     "btn_settings": {"uz": "⚙️ Sozlamalar", "en": "⚙️ Settings", "ru": "⚙️ Настройки"},
     "btn_language": {"uz": "🌐 Tilni o'zgartirish", "en": "🌐 Change language", "ru": "🌐 Сменить язык"},
@@ -378,6 +383,140 @@ TEXTS = {
         "uz": "✅ E'loningiz reja bo'yicha (haftada 1 marta) muddati tugaguncha chiqarilishda davom etaveradi.",
         "en": "✅ Your announcement will continue to be posted weekly according to schedule until expiration.",
         "ru": "✅ Ваше объявление продолжит публиковаться еженедельно по графику до окончания срока.",
+    },
+
+    "must_subscribe_channel": {
+        "uz": (
+            "⚠️ <b>Botimizdan to'liq foydalanish uchun rasmiy kanalimizga a'zo bo'lishingiz kerak!</b>\n\n"
+            "Kanalga a'zo bo'lgach, quyidagi <b>«✅ Obunani tekshirish»</b> tugmasini bosing:"
+        ),
+        "en": (
+            "⚠️ <b>To use our bot, please subscribe to our official channel!</b>\n\n"
+            "After subscribing, click the <b>«✅ Check Subscription»</b> button below:"
+        ),
+        "ru": (
+            "⚠️ <b>Для использования бота необходимо подписаться на наш официальный канал!</b>\n\n"
+            "После подписки нажмите кнопку <b>«✅ Проверить подписку»</b> ниже:"
+        ),
+    },
+    "btn_subscribe_channel": {
+        "uz": "📢 Kanalga a'zo bo'lish",
+        "en": "📢 Subscribe to Channel",
+        "ru": "📢 Подписаться на канал",
+    },
+    "btn_check_subscription": {
+        "uz": "✅ Obunani tekshirish",
+        "en": "✅ Check Subscription",
+        "ru": "✅ Проверить подписку",
+    },
+    "sub_not_joined": {
+        "uz": "❌ Siz hali kanalga a'zo bo'lmadingiz! Iltimos, avval kanalga a'zo bo'ling.",
+        "en": "❌ You are not subscribed to the channel yet! Please subscribe first.",
+        "ru": "❌ Вы еще не подписались на канал! Пожалуйста, сначала подпишитесь.",
+    },
+    "sub_joined_success": {
+        "uz": "✅ Obunangiz tasdiqlandi! Talant24 ga xush kelibsiz!",
+        "en": "✅ Subscription confirmed! Welcome to Talant24!",
+        "ru": "✅ Подписка подтверждена! Добро пожаловать в Talant24!",
+    },
+
+    "referral_active_info": {
+        "uz": (
+            "🎁 <b>Do'stlarni taklif qilish dasturi</b>\n\n"
+            "Maxsus havolangiz orqali 7 kun ichida <b>5 ta do'stingiz</b> botga kirib /start bossa, sizga <b>1 ta BEPUL Premium e'lon</b> (10 000 so'mlik) beriladi!\n\n"
+            "📊 <b>Natijangiz:</b> <b>{invited_count} / {target_count}</b> ta do'st\n"
+            "⏳ <b>Havola muddati:</b> {days} kun {hours} soat qoldi\n\n"
+            "Sizning taklif havolangiz:\n"
+            "👉 <code>{link}</code>\n\n"
+            "<i>Do'stlaringizga yuborish uchun pastdagi tugmani bosing!</i>"
+        ),
+        "en": (
+            "🎁 <b>Invite Friends Program</b>\n\n"
+            "If <b>5 friends</b> join the bot using your link within 7 days and send /start, you will receive <b>1 FREE Premium announcement</b>!\n\n"
+            "📊 <b>Your progress:</b> <b>{invited_count} / {target_count}</b> friends\n"
+            "⏳ <b>Link validity:</b> {days}d {hours}h left\n\n"
+            "Your invite link:\n"
+            "👉 <code>{link}</code>"
+        ),
+        "ru": (
+            "🎁 <b>Программа приглашения друзей</b>\n\n"
+            "Если <b>5 друзей</b> перейдут по вашей ссылке в течение 7 дней и отправят /start, вы получите <b>1 БЕСПЛАТНОЕ Премиум объявление</b>!\n\n"
+            "📊 <b>Ваш результат:</b> <b>{invited_count} / {target_count}</b> друзей\n"
+            "⏳ <b>Срок ссылки:</b> осталось {days}д {hours}ч\n\n"
+            "Ваша ссылка для приглашения:\n"
+            "👉 <code>{link}</code>"
+        ),
+    },
+    "referral_cooldown_info": {
+        "uz": (
+            "⏳ <b>Avvalgi taklif havolangiz muddati tugagan.</b>\n\n"
+            "Do'stlarni taklif qilish imkoniyatidan har <b>1 oyda 1 marta</b> foydalanish mumkin.\n"
+            "Yangi havola yaratish uchun: <b>{days} kun {hours} soat</b> qoldi.\n\n"
+            "🎁 Sizdagi bepul Premium e'lonlar: <b>{free_posts} ta</b>"
+        ),
+        "en": (
+            "⏳ <b>Your previous invite link has expired.</b>\n\n"
+            "The invite feature is available <b>once a month</b>.\n"
+            "Time remaining to create a new link: <b>{days}d {hours}h</b>.\n\n"
+            "🎁 Your free Premium posts: <b>{free_posts}</b>"
+        ),
+        "ru": (
+            "⏳ <b>Срок действия вашей предыдущей ссылки истек.</b>\n\n"
+            "Возможность приглашать друзей доступна <b>1 раз в месяц</b>.\n"
+            "До создания новой ссылки осталось: <b>{days}д {hours}ч</b>.\n\n"
+            "🎁 Ваши бесплатные Премиум объявления: <b>{free_posts}</b>"
+        ),
+    },
+    "btn_share_referral": {
+        "uz": "↗️ Do'stlarga ulashish",
+        "en": "↗️ Share with friends",
+        "ru": "↗️ Поделиться с друзьями",
+    },
+    "referral_share_message": {
+        "uz": "👋 Salom! Talant24 botida ish, xodim, ustoz va shogird topish juda oson. Botga qo'shiling:\n{link}",
+        "en": "👋 Hello! Find jobs, specialists, and mentors easily on Talant24. Join the bot:\n{link}",
+        "ru": "👋 Привет! В боте Talant24 очень просто найти работу или специалистов. Присоединяйтесь:\n{link}",
+    },
+    "referral_joined_notification": {
+        "uz": "🎉 Do'stingiz <b>{name}</b> sizning havolangiz orqali botga qo'shildi! ({invited_count}/{target_count})",
+        "en": "🎉 Your friend <b>{name}</b> joined via your invite link! ({invited_count}/{target_count})",
+        "ru": "🎉 Ваш друг <b>{name}</b> присоединился по вашей ссылке! ({invited_count}/{target_count})",
+    },
+    "referral_reward_notification": {
+        "uz": (
+            "🏆 <b>TABRIKLAYMIZ!</b>\n\n"
+            "Siz 5 ta do'stingizni muvaffaqiyatli taklif qildingiz va <b>1 ta BEPUL Premium e'lon</b> imkoniyatini qo'lga kiritdingiz! 🎁\n\n"
+            "Endi yangi e'lon berishda Premium tarifni tanlasangiz, 10 000 so'm to'lov talab qilinmaydi va e'loningiz 4 hafta davomida kanalga chiqariladi!"
+        ),
+        "en": (
+            "🏆 <b>CONGRATULATIONS!</b>\n\n"
+            "You invited 5 friends and received <b>1 FREE Premium announcement</b>! 🎁\n\n"
+            "Select the Premium plan when posting an announcement — no payment will be needed!"
+        ),
+        "ru": (
+            "🏆 <b>ПОЗДРАВЛЯЕМ!</b>\n\n"
+            "Вы пригласили 5 друзей и получили <b>1 БЕСПЛАТНОЕ Премиум объявление</b>! 🎁\n\n"
+            "При подаче объявления выберите Премиум — оплата не потребуется!"
+        ),
+    },
+    "btn_plan_premium_free": {
+        "uz": "🎁 💎 Premium (BEPUL — 1 ta imkoniyatingiz bor)",
+        "en": "🎁 💎 Premium (FREE — 1 post available)",
+        "ru": "🎁 💎 Премиум (БЕСПЛАТНО — 1 попытка)",
+    },
+    "using_free_premium_reward": {
+        "uz": (
+            "🎁 <b>Sizda do'stlar taklifi orqali 1 ta BEPUL Premium e'lon imkoniyati bor!</b>\n\n"
+            "Ushbu e'lon uchun 10 000 so'm to'lov talab qilinmaydi va u to'g'ridan-to'g'ri tekshirishga yuboriladi."
+        ),
+        "en": (
+            "🎁 <b>You have 1 FREE Premium announcement from referrals!</b>\n\n"
+            "No payment is required, your announcement will be sent directly for review."
+        ),
+        "ru": (
+            "🎁 <b>У вас есть 1 БЕСПЛАТНОЕ Премиум объявление за приглашение друзей!</b>\n\n"
+            "Оплата не требуется, ваше объявление будет сразу отправлено на проверку."
+        ),
     },
 }
 
