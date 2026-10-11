@@ -1,7 +1,7 @@
 // Backend bilan muloqot. Barcha so'rovlar /api/admin/* ga ketadi va
 // Authorization: Token <token> header bilan yuboriladi.
 
-const BASE = import.meta.env.VITE_API_URL || "/api/admin";
+const BASE = import.meta.env.VITE_API_URL || `${import.meta.env.BASE_URL}api/admin`;
 const TOKEN_KEY = "talanthub_admin_token";
 
 export const tokenStore = {
