@@ -128,6 +128,8 @@ INTERNAL_API_KEY = env("INTERNAL_API_KEY", default="change-me-internal-key")
 # Django tomonidan to'g'ridan-to'g'ri Telegram Bot API'ga so'rov yuboriladi.
 TELEGRAM_BOT_TOKEN = env("BOT_TOKEN", default="")
 TELEGRAM_CHANNEL_ID = env("CHANNEL_ID", default="")  # masalan: @talanthub_channel yoki -100...
+TELEGRAM_CHANNEL_URL = env("CHANNEL_URL", default="")
+
 
 # Bitta foydalanuvchi tasdiqlangan e'londan keyin necha soatdan so'ng
 # yangi e'lon joylay olishi mumkinligi (tekin e'lonlar uchun).
