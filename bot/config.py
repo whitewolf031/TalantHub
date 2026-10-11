@@ -17,7 +17,11 @@ PAYMENT_CARD_OWNER = os.getenv("PAYMENT_CARD_OWNER", "Talant24 Admin")
 PAYMENT_AMOUNT = int(os.getenv("PAYMENT_AMOUNT", "10000") or 10000)
 
 CHANNEL_ID = os.getenv("CHANNEL_ID", "")
-CHANNEL_INVITE_LINK = os.getenv("CHANNEL_INVITE_LINK", "")
+CHANNEL_URL = (
+    os.getenv("CHANNEL_URL", "").strip()
+    or os.getenv("CHANNEL_LINK", "").strip()
+    or os.getenv("CHANNEL_INVITE_LINK", "").strip()
+)
 
 
 
